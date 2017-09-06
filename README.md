@@ -15,6 +15,8 @@ $ npm install ...
 
 ## cwt.sign(payload, secret)
 
+Returns the CborWebToken as a string.
+
 Example:
 ```js
 ...
@@ -22,12 +24,16 @@ Example:
 
 ## cwt.verify(token, secret)
 
+Returns the payload decoded if the signature (and, optionally, expiration, audience, issuer) are valid. If not, it will throw an error.
+
 Example:
 ```js
 ...
 ```
 
 ## cwt.decode(token)
+
+Returns the decoded payload without verifying if the signature is valid.
 
 Example:
 ```js
