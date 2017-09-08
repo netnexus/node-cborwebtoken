@@ -1,30 +1,28 @@
 var cbor = require('cbor');
-var base64 = require('base-64');
+//var base64 = require('base-64');
 
 var claims = {iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5 , iat: 6, cti: 7};
-var payload = {iss: 'test',exp: 'abc'}
+var payload = {iss: "test" , 3: "abc", undefined: "wasd", aud : "try", 123920: "mk"}
+    
 //var headerparameters = ['alg', 'crit', 'content_type', 'kid', 'IV', 'Partial_IV', 'counter_signature'];
 var header = { alg: 4};
 
-function buildMap(obj) {
+function buildMap(obj:any): Map<string | number, any> {
+    var m = new Map();
     for (var key of Object.keys(obj)){
-        if((Object.keys(obj[key])).indexOf(Object.keys(claims)) {
-            console.log(Object.keys(claims));
-            console.log((Object.keys(payload[key])));
-        //    if( [1, 2, 3, 4, 5, 6, 7].includes(claims.indexOf(key)+1)){
-         //       var test = Object.keys(obj).reduce((map, key) => map.set(claims.indexOf(key)+1, obj[key]), new Map());
-                test = cbor.encode(test);
-       /*     }else {
-                throw new Error ('invalid payload key!');
+        if(Object.keys(claims).indexOf(key) >-1 && !(obj[claims[key]])) {
+            m.set(claims[key], obj[key]);
+        }else{
+            if (Object.values(claims).indexOf(obj[key])){
+                if (parseInt(key)){
+                    m.set(parseInt(key), obj[key]);
+                }else{
+                    m.set(key, obj[key]);
+                }
             }
-        }else {
-            throw new Error ('invalid payload key!');
         }
-    }
-    */
-    return test;
-    }
-}
+    }console.log(m);
+return cbor.encode(m);
 }
 
 function preparepayload(obj) {
@@ -44,7 +42,7 @@ function prepareItem(obj, header){
     //preparing header
     for (var key of Object.keys(header)){
         if (header[key] != 4){
-            return (console.log('wrong algorithm, try 17'));
+            return (console.log('wrong algorithm, try 4'));
         }
         else{
             //putting header and payload together
@@ -59,7 +57,6 @@ function prepareItem(obj, header){
 function wrapItem(obj){
     //wrap obj..
 }
-const map = buildMap(payload);
-var y = prepareItem(payload, header);
-console.log(y);
-y = wrapItem(y);
+const tester = buildMap(payload);
+console.log((tester));
+
