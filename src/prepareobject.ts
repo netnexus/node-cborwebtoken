@@ -1,4 +1,5 @@
 var cbor = require('cbor');
+var cose = require('cose-js');
 //var base64 = require('base-64');
 
 var claims = {iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5 , iat: 6, cti: 7};
@@ -21,7 +22,7 @@ function buildMap(obj:any): Map<string | number, any> {
                 }
             }
         }
-    }console.log(m);
+    }
 return cbor.encode(m);
 }
 
@@ -54,9 +55,12 @@ function prepareItem(obj, header){
 }
 
 
+
+
+
 function wrapItem(obj){
     //wrap obj..
 }
 const tester = buildMap(payload);
+var tester2 = cose.doMac(payload,17);
 console.log((tester));
-
