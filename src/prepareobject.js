@@ -59,8 +59,14 @@ function wrapItem(obj) {
     //wrap obj..
 }
 var tester = buildMap(payload);
-cose.mac.create({ 'p': { "alg": "HS256" }, 'u': {} }, tester, [{ 'key': Buffer.from("403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388", 'hex') }])
+cose.mac.create({ 'p': { "alg": "SHA-256_64" } }, tester, [{ 'key': Buffer.from("403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388", 'hex') }])
     .then(function (buf) {
-    console.log(buf.toString('hex'));
+    var tag = (cbor.decode(buf).value[3]);
+    tag = tag.slice(0, 8);
+    buf = cbor.decode(buf);
+    buf.value[3] = tag;
+    buf = cbor.encode(buf);
+    buf = buf.toString('hex');
+    console.log(buf);
 });
 //# sourceMappingURL=prepareobject.js.map
