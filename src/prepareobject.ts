@@ -61,19 +61,29 @@ function prepareItem(obj, header){
 function wrapItem(obj){
     //wrap obj..
 }
+
 var tester = buildMap(payload);
 
 
-cose.mac.create(
-    { 'p':{"alg":"SHA-256_64"}},
-    tester,
-    [{'key':Buffer.from("403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388", 'hex')}])
-  .then((buf) => {
-    var tag = (cbor.decode(buf).value[3]);
-    tag  = tag.slice(0,8);
-    buf = cbor.decode(buf);
-    buf.value[3] = tag;
-    buf = cbor.encode(buf);
-    buf = buf.toString('hex');
-    console.log(buf);
+export class cborwebtoken {
+    public async mac(payload: string | Buffer | object, secret: string | Buffer): Promise<Buffer> {
+        let buf = await cose.mac.create(
+            { 'p': { "alg": "SHA-256_64" } },
+            payload,
+            [{ 'key': secret }])
+        console.log(secret);
+        var tag = (cbor.decode(buf).value[3]);
+        tag = tag.slice(0, 8);
+        buf = cbor.decode(buf);
+        buf.value[3] = tag;
+        buf = cbor.encode(buf);
+        buf = buf.toString('hex');
+        return buf;
+    }
+}
+let cwt = new cborwebtoken();
+var secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
+
+const tokenResponse = cwt.mac(tester, Buffer.from(secret, 'hex')).then((tokenResponse) => {
+    console.log(tokenResponse);
 });

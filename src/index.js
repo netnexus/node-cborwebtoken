@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 module.exports = {
     decode: require('./decode'),
     verify: require('./verify'),
