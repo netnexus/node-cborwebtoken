@@ -39,11 +39,35 @@ var cbor = require('cbor');
 var cose = require('cose-js');
 var jsonfile = require('jsonfile');
 var base64url = require('base64url');
-//var base64 = require('base-64');
+//those are using the given example (from: https://tools.ietf.org/html/draft-ietf-ace-cbor-web-token-08#appendix-A.4) as their current default. Will change later on.
 var claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
 var payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from('0b71', 'hex') };
-//var headerparameters = ['alg', 'crit', 'content_type', 'kid', 'IV', 'Partial_IV', 'counter_signature'];
-var header = { alg: 4 };
+var cborwebtoken = (function () {
+    function cborwebtoken() {
+    }
+    cborwebtoken.prototype.mac = function (payload, secret) {
+        return __awaiter(this, void 0, void 0, function () {
+            var buf, tag;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, cose.mac.create({ 'p': { "alg": "SHA-256_64" } }, payload, [{ 'key': secret }])];
+                    case 1:
+                        buf = _a.sent();
+                        tag = (cbor.decode(buf).value[3]);
+                        tag = tag.slice(0, 8);
+                        buf = cbor.decode(buf);
+                        buf.value[3] = tag;
+                        buf = cbor.encode(buf);
+                        buf = buf.toString('hex');
+                        buf = 'd83d' + buf;
+                        return [2 /*return*/, buf];
+                }
+            });
+        });
+    };
+    return cborwebtoken;
+}());
+exports.cborwebtoken = cborwebtoken;
 function buildMap(obj) {
     var m = new Map();
     for (var _i = 0, _a = Object.keys(obj); _i < _a.length; _i++) {
@@ -64,64 +88,8 @@ function buildMap(obj) {
     }
     return cbor.encode(m);
 }
-function preparepayload(obj) {
-    //replacing claims with their respective ids
-    for (var _i = 0, _a = Object.keys(obj); _i < _a.length; _i++) {
-        var key = _a[_i];
-        /*       var handle = claims.indexOf(key)+1;
-               obj[handle] = obj[key];
-               delete(obj[key]);
-       }*/
-        return obj;
-    }
-}
-function prepareItem(obj, header) {
-    obj = buildMap(obj);
-    //preparing header
-    for (var _i = 0, _a = Object.keys(header); _i < _a.length; _i++) {
-        var key = _a[_i];
-        if (header[key] != 4) {
-            return (console.log('wrong algorithm, try 4'));
-        }
-        else {
-            //putting header and payload together
-            var COSE_Mac0 = [header, obj];
-        }
-    }
-    //encoding the newly assembled Object
-    console.log(COSE_Mac0);
-    return cbor.encode(COSE_Mac0);
-}
-function wrapItem(obj) {
-    //wrap obj..
-}
+//testing via given example (from: https://tools.ietf.org/html/draft-ietf-ace-cbor-web-token-08#appendix-A.4 )
 var tester = buildMap(payload);
-var cborwebtoken = (function () {
-    function cborwebtoken() {
-    }
-    cborwebtoken.prototype.mac = function (payload, secret) {
-        return __awaiter(this, void 0, void 0, function () {
-            var buf, tag;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, cose.mac.create({ 'p': { "alg": "SHA-256_64" } }, payload, [{ 'key': secret }])];
-                    case 1:
-                        buf = _a.sent();
-                        console.log(secret);
-                        tag = (cbor.decode(buf).value[3]);
-                        tag = tag.slice(0, 8);
-                        buf = cbor.decode(buf);
-                        buf.value[3] = tag;
-                        buf = cbor.encode(buf);
-                        buf = buf.toString('hex');
-                        return [2 /*return*/, buf];
-                }
-            });
-        });
-    };
-    return cborwebtoken;
-}());
-exports.cborwebtoken = cborwebtoken;
 var cwt = new cborwebtoken();
 var secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
 var tokenResponse = cwt.mac(tester, Buffer.from(secret, 'hex')).then(function (tokenResponse) {
