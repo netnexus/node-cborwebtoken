@@ -45,7 +45,7 @@ var payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.e
 var cborwebtoken = (function () {
     function cborwebtoken() {
     }
-    cborwebtoken.prototype.mac = function (payload, secret) {
+    cborwebtoken.prototype.sign = function (payload, secret) {
         return __awaiter(this, void 0, void 0, function () {
             var buf, tag;
             return __generator(this, function (_a) {
@@ -54,12 +54,39 @@ var cborwebtoken = (function () {
                     case 1:
                         buf = _a.sent();
                         tag = (cbor.decode(buf).value[3]);
-                        tag = tag.slice(0, 8);
                         buf = cbor.decode(buf);
                         buf.value[3] = tag;
                         buf = cbor.encode(buf);
                         buf = buf.toString('hex');
                         buf = 'd83d' + buf;
+                        return [2 /*return*/, buf];
+                }
+            });
+        });
+    };
+    cborwebtoken.prototype.decode = function (token) {
+        return __awaiter(this, void 0, void 0, function () {
+            var buf;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, cbor.decode(token)];
+                    case 1:
+                        buf = _a.sent();
+                        buf = buf.value[2];
+                        buf = cbor.decode(buf);
+                        return [2 /*return*/, buf];
+                }
+            });
+        });
+    };
+    cborwebtoken.prototype.verify = function (token, secret) {
+        return __awaiter(this, void 0, void 0, function () {
+            var buf;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, cose.mac.read(token, secret)];
+                    case 1:
+                        buf = _a.sent();
                         return [2 /*return*/, buf];
                 }
             });
@@ -92,7 +119,15 @@ function buildMap(obj) {
 var tester = buildMap(payload);
 var cwt = new cborwebtoken();
 var secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
-var tokenResponse = cwt.mac(tester, Buffer.from(secret, 'hex')).then(function (tokenResponse) {
-    console.log(tokenResponse);
+var token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
+// to test the following cwt.functions remove commentary for console.log debugging
+var tokenResponse = cwt.sign(tester, Buffer.from(secret, 'hex')).then(function (tokenResponse) {
+    //  console.log(tokenResponse);
+});
+var decodeTest = cwt.decode(token).then(function (decodeTest) {
+    //  console.log(decodeTest);
+});
+var verifyTest = cwt.verify(token, secret).then(function (verifyTest) {
+    console.log(cbor.decode(verifyTest));
 });
 //# sourceMappingURL=prepareobject.js.map
