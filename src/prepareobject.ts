@@ -3,77 +3,69 @@ const cose = require('cose-js');
 const jsonfile = require('jsonfile');
 const base64url = require('base64url');
 
-//var base64 = require('base-64');
+//those are using the given example (from: https://tools.ietf.org/html/draft-ietf-ace-cbor-web-token-08#appendix-A.4) as their current default. Will change later on.
+var claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
+var payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from('0b71', 'hex') }
 
-var claims = {iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5 , iat: 6, cti: 7};
-var payload = {iss: "coap://as.example.com" , sub: "erikw", aud: "coap://light.example.com", exp : 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from('0b71','hex')}
-    
-//var headerparameters = ['alg', 'crit', 'content_type', 'kid', 'IV', 'Partial_IV', 'counter_signature'];
-var header = { alg: 4};
+export class cborwebtoken {
+    public async sign(payload: string | Buffer | object, secret: string | Buffer): Promise<Buffer> {
+        let buf = await cose.mac.create(
+            { 'p': { "alg": "SHA-256_64" } },
+            payload,
+            [{ 'key': secret }])
+        var tag = (cbor.decode(buf).value[3]);
+        buf = cbor.decode(buf);
+        buf.value[3] = tag;
+        buf = cbor.encode(buf);
+        buf = buf.toString('hex');
+        buf = 'd83d' + buf;
+        return buf;
+    }
+    public async decode(token: string): Promise<Buffer> {
+        let buf = await cbor.decode(token);
+        buf = buf.value[2];
+        buf = cbor.decode(buf);
+        return buf;
+    }
+    public async verify(token: string | Buffer | object, secret: string | Buffer): Promise<Buffer> {
+        let buf = await cose.mac.read(token, secret)
+        return buf;
+    }
+}
 
-function buildMap(obj:any): Map<string | number, any> {
+function buildMap(obj: any): Map<string | number, any> {
     var m = new Map();
-    for (var key of Object.keys(obj)){
-        if(Object.keys(claims).indexOf(key) >-1 && !(obj[claims[key]])) {
+    for (var key of Object.keys(obj)) {
+        if (Object.keys(claims).indexOf(key) > -1 && !(obj[claims[key]])) {
             m.set(claims[key], obj[key]);
-        }else{
-            if (Object.values(claims).indexOf(obj[key])){
-                if (parseInt(key)){
+        } else {
+            if (Object.values(claims).indexOf(obj[key])) {
+                if (parseInt(key)) {
                     m.set(parseInt(key), obj[key]);
-                }else{
+                } else {
                     m.set(key, obj[key]);
                 }
             }
         }
     }
-return cbor.encode(m);
-
+    return cbor.encode(m);
 }
 
-function preparepayload(obj) {
-    //replacing claims with their respective ids
-    for (var key of Object.keys(obj)){
-     /*       var handle = claims.indexOf(key)+1;
-            obj[handle] = obj[key];
-            delete(obj[key]);
-    }*/
-    return obj;
-    }
-}
-
-
-function prepareItem(obj, header){
-    obj = buildMap(obj);
-    //preparing header
-    for (var key of Object.keys(header)){
-        if (header[key] != 4){
-            return (console.log('wrong algorithm, try 4'));
-        }
-        else{
-            //putting header and payload together
-            var COSE_Mac0 = [ header, obj];
-        }
-    }
-    //encoding the newly assembled Object
-    console.log(COSE_Mac0);
-    return cbor.encode(COSE_Mac0);
-}
-function wrapItem(obj){
-    //wrap obj..
-}
+//testing via given example (from: https://tools.ietf.org/html/draft-ietf-ace-cbor-web-token-08#appendix-A.4 )
 var tester = buildMap(payload);
+let cwt = new cborwebtoken();
+var secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
+var token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
 
+// to test the following cwt.functions remove commentary for console.log debugging
+const tokenResponse = cwt.sign(tester, Buffer.from(secret, 'hex')).then((tokenResponse) => {
+  //  console.log(tokenResponse);
+});
 
-cose.mac.create(
-    { 'p':{"alg":"SHA-256_64"}},
-    tester,
-    [{'key':Buffer.from("403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388", 'hex')}])
-  .then((buf) => {
-    var tag = (cbor.decode(buf).value[3]);
-    tag  = tag.slice(0,8);
-    buf = cbor.decode(buf);
-    buf.value[3] = tag;
-    buf = cbor.encode(buf);
-    buf = buf.toString('hex');
-    console.log(buf);
+var decodeTest = cwt.decode(token).then((decodeTest) => {
+  //  console.log(decodeTest);
+});
+
+var verifyTest = cwt.verify(token, secret).then((verifyTest) => {
+    //console.log(cbor.decode(verifyTest));
 });

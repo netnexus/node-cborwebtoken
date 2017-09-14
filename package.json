@@ -21,6 +21,7 @@
     "debug": "~2.6.8",
     "fast-sha256": "~1.0.0",
     "jquery-slim": "~3.0.0",
+    "read-glob-promise": "~2.0.0",
     "remap-istanbul": "~0.9.5",
     "typescript": "~2.4.2"
   },
