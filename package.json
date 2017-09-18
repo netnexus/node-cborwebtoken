@@ -10,11 +10,9 @@
     "url": "https://github.com/netnexus/node-cborwebtoken"
   },
   "dependencies": {
-    "@types/chai": "~4.0.2",
     "@types/debug": "~0.0.29",
     "base-64": "0.1.0",
     "cbor": "3.0.3",
-    "chai": "~4.1.0",
     "co-body": "~5.1.1",
     "cose-js": "https://github.com/netnexus/cose-js.git",
     "crypto": "1.0.1",
@@ -26,17 +24,24 @@
     "typescript": "~2.4.2"
   },
   "devDependencies": {
+    "@types/chai": "^4.0.4",
     "@types/chai-as-promised": "~0.0.31",
-    "@types/mocha": "~2.2.41",
+    "@types/mocha": "^2.2.43",
     "@types/nock": "~8.2.1",
     "base64url": "2.0.0",
-    "chai-as-promised": "~6.0.0",
+    "chai": "^4.1.2",
     "istanbul": "~0.4.5",
     "jsonfile": "3.0.1",
+    "lodash": "4.17.4",
     "mocha": "~3.5.0",
-    "nock": "~9.0.14",
+    "mochai": "^0.2.5",
     "nodemon": "~1.11.0",
     "sqlite3": "~3.1.8",
+    "ts-node": "^3.3.0",
+    "typings": "^2.1.1",
     "watch": "^1.0.2"
+  },
+  "scripts": {
+    "test": "tsc && mocha ./test/prepareobject.spec.js"
   }
 }
