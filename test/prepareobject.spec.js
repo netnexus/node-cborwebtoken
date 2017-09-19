@@ -118,31 +118,26 @@ describe('.verify',()=>{
     })
 */
 describe('payloadcheck', function () {
-    it('should return an OK if the payload is valid', function () { return __awaiter(_this, void 0, void 0, function () {
-        var secret, claims, payload, cwt, test, test2, test3, test4, _i, _a, key;
+    it('should replace payload keys', function () { return __awaiter(_this, void 0, void 0, function () {
+        var secret, payload, payloadexpected, cwt, token, decodedcwt, actualpayload, arr, _i, _a, key;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
-                    claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
-                    payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from('0b71', 'hex') };
+                    payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from('0b71', 'hex'), test: "test" };
+                    payloadexpected = { 1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com", 4: 1444064944, 5: 1443944944, 6: 1443944944, 7: Buffer.from('0b71', 'hex'), test: "test" };
                     cwt = new prepareobject_1.cborwebtoken();
                     return [4 /*yield*/, cwt.sign(payload, Buffer.from(secret, 'hex'))];
                 case 1:
-                    test = _b.sent();
-                    test2 = cbor.decode(test);
-                    test3 = test2["value"]["value"][2];
-                    test4 = cbor.decode(test3);
-                    for (_i = 0, _a = Array.from(test4.keys()); _i < _a.length; _i++) {
+                    token = _b.sent();
+                    decodedcwt = cbor.decode(token);
+                    actualpayload = cbor.decode(decodedcwt["value"]["value"][2]);
+                    arr = [];
+                    for (_i = 0, _a = Array.from(actualpayload.keys()); _i < _a.length; _i++) {
                         key = _a[_i];
-                        console.log(key);
-                        console.log(test4.get(key));
-                        console.log(Object.keys(claims)[Object.values(payload).indexOf(test4.get(key))]);
-                        console.log(Object.keys(payload[test4.get(key)]));
-                        //expect(test4.get(key)).to.eql(payload.key[claims[value].key]);
-                        //expect(Object.keys(claims)[Object.values(payload).indexOf(test4.get(key))]).to.eql.(Object.keys(payload[test4.get(key)]))
+                        arr.push(key.toString());
                     }
-                    chai_1.expect(test4).to.eql(test4);
+                    chai_1.expect(arr).to.eql(Object.keys(payloadexpected));
                     return [2 /*return*/];
             }
         });
