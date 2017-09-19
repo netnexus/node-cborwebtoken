@@ -38,100 +38,80 @@ var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
 require("mocha");
-var prepareobject_1 = require("../src/prepareobject");
-var cbor = require('cbor');
-var cose = require('cose-js');
-var jsonfile = require('jsonfile');
-var base64url = require('base64url');
-describe('.sign()', function () {
-    it('should return the CborWebToken as a string', function () { return __awaiter(_this, void 0, void 0, function () {
+var index_1 = require("../src/index");
+var cbor = require("cbor");
+var cose = require("cose-js");
+describe(".mac()", function () {
+    it("should return the CborWebToken as a string", function () { return __awaiter(_this, void 0, void 0, function () {
         var cwt, payload, secret, test;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    cwt = new prepareobject_1.cborwebtoken();
-                    payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from('0b71', 'hex') };
-                    secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
-                    return [4 /*yield*/, cwt.sign(payload, Buffer.from(secret, 'hex'))];
+                    cwt = new index_1.Cborwebtoken();
+                    payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex") };
+                    secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
+                    return [4 /*yield*/, cwt.mac(payload, Buffer.from(secret, "hex"))];
                 case 1:
                     test = _a.sent();
-                    //assert
-                    chai_1.expect(test).to.eql('d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200');
+                    // assert
+                    chai_1.expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200");
                     return [2 /*return*/];
             }
         });
     }); });
 });
-describe('.decode', function () {
-    it('should return the payload without verifying if the signature is valid', function () { return __awaiter(_this, void 0, void 0, function () {
+describe(".decode", function () {
+    it("should return the payload without verifying if the signature is valid", function () { return __awaiter(_this, void 0, void 0, function () {
         var cwt, token, payload;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    cwt = new prepareobject_1.cborwebtoken();
+                    cwt = new index_1.Cborwebtoken();
                     token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
                     return [4 /*yield*/, cwt.decode(token)];
                 case 1:
                     payload = _a.sent();
-                    //assert
+                    // assert
                     chai_1.expect(payload).to.eql("a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
                     return [2 /*return*/];
             }
         });
     }); });
 });
-describe('.verify', function () {
-    it('should return the payload if the signature is valid. If not it will throw an Error', function () { return __awaiter(_this, void 0, void 0, function () {
+describe(".verify", function () {
+    it("should return the payload if the signature is valid. If not it will throw an Error", function () { return __awaiter(_this, void 0, void 0, function () {
         var cwt, token, secret, payload;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    cwt = new prepareobject_1.cborwebtoken();
+                    cwt = new index_1.Cborwebtoken();
                     token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
-                    secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
-                    return [4 /*yield*/, cwt.verify(token, Buffer.from(secret, 'hex'))];
+                    secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
+                    return [4 /*yield*/, cwt.verify(token, Buffer.from(secret, "hex"))];
                 case 1:
                     payload = _a.sent();
-                    //assert
+                    // assert
                     chai_1.expect(payload).to.eql("a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
                     return [2 /*return*/];
             }
         });
     }); });
 });
-/*
-describe('.verify',()=>{
-    it('should return an Error if the signature is invalid.', async()=>{
-        //arrange
-        let cwt = new cborwebtoken();
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
-        var secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
-        //act
-        try{
-            await cwt.verify(token, Buffer.from(secret, 'hex'));
-            throw new Error('Tag mismatch');
-        //assert
-        }catch (err) {
-            expect(err.message).to.eq("Tag mismatch");
-        }
-    })
-    })
-*/
-describe('payloadcheck', function () {
-    it('should replace payload keys', function () { return __awaiter(_this, void 0, void 0, function () {
+describe("payloadcheck", function () {
+    it("should replace payload keys", function () { return __awaiter(_this, void 0, void 0, function () {
         var secret, payload, payloadexpected, cwt, token, decodedcwt, actualpayload, arr, _i, _a, key;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    secret = '403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388';
-                    payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from('0b71', 'hex'), test: "test" };
-                    payloadexpected = { 1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com", 4: 1444064944, 5: 1443944944, 6: 1443944944, 7: Buffer.from('0b71', 'hex'), test: "test" };
-                    cwt = new prepareobject_1.cborwebtoken();
-                    return [4 /*yield*/, cwt.sign(payload, Buffer.from(secret, 'hex'))];
+                    secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
+                    payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com", exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"), test: "test" };
+                    payloadexpected = { 1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com", 4: 1444064944, 5: 1443944944, 6: 1443944944, 7: Buffer.from("0b71", "hex"), test: "test" };
+                    cwt = new index_1.Cborwebtoken();
+                    return [4 /*yield*/, cwt.mac(payload, Buffer.from(secret, "hex"))];
                 case 1:
                     token = _b.sent();
                     decodedcwt = cbor.decode(token);
-                    actualpayload = cbor.decode(decodedcwt["value"]["value"][2]);
+                    actualpayload = cbor.decode(decodedcwt.value.value[2]);
                     arr = [];
                     for (_i = 0, _a = Array.from(actualpayload.keys()); _i < _a.length; _i++) {
                         key = _a[_i];

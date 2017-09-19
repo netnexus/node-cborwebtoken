@@ -2,7 +2,7 @@
   "name": "node-cborwebtoken",
   "version": "0.0.1",
   "description": "Implementation of CBOR Web Tokens for node",
-  "main": "TBD",
+  "main": "../src/build/src/index.js",
   "author": "NetNexus",
   "license": "ISC",
   "repository": {
@@ -10,38 +10,20 @@
     "url": "https://github.com/netnexus/node-cborwebtoken"
   },
   "dependencies": {
-    "@types/debug": "~0.0.29",
-    "base-64": "0.1.0",
     "cbor": "3.0.3",
-    "co-body": "~5.1.1",
     "cose-js": "https://github.com/netnexus/cose-js.git",
     "crypto": "1.0.1",
-    "debug": "~2.6.8",
-    "fast-sha256": "~1.0.0",
-    "jquery-slim": "~3.0.0",
-    "read-glob-promise": "~2.0.0",
-    "remap-istanbul": "~0.9.5",
+    "tslint": "^5.7.0",
     "typescript": "~2.4.2"
   },
   "devDependencies": {
-    "@types/chai": "^4.0.4",
-    "@types/chai-as-promised": "~0.0.31",
     "@types/mocha": "^2.2.43",
     "@types/nock": "~8.2.1",
-    "base64url": "2.0.0",
-    "chai": "^4.1.2",
-    "istanbul": "~0.4.5",
-    "jsonfile": "3.0.1",
-    "lodash": "4.17.4",
     "mocha": "~3.5.0",
-    "mochai": "^0.2.5",
-    "nodemon": "~1.11.0",
-    "sqlite3": "~3.1.8",
     "ts-node": "^3.3.0",
-    "typings": "^2.1.1",
-    "watch": "^1.0.2"
+    "typings": "^2.1.1"
   },
   "scripts": {
-    "test": "tsc && mocha ./test/prepareobject.spec.js"
+    "test": "tsc && mocha ./src/build/test/prepareobject.spec.js"
   }
 }
