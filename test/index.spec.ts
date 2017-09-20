@@ -16,13 +16,13 @@ describe(".mac()", () => {
         const cwt = new Cborwebtoken();
         // tslint:disable-next-line:object-literal-sort-keys
         const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
-                          exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex") };
+                          exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex") };
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // act
         const test =  await cwt.mac(payload, Buffer.from(secret, "hex"));
         // assert
         // tslint:disable-next-line:max-line-length
-        expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200");
+        expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b71489a40ee1da52a4a1a");
     });
 });
   /**
@@ -35,12 +35,12 @@ describe(".decode", () => {
         // arrange
         const cwt = new Cborwebtoken();
         // tslint:disable-next-line:max-line-length
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
+        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
         // act
         const payload = await cwt.decode(token);
         // assert
         // tslint:disable-next-line:max-line-length
-        expect(payload).to.eql(cbor.decode("A76369737375636F61703A2F2F61732E6578616D706C652E636F6D63737562656572696B77636175647818636F61703A2F2F6C696768742E6578616D706C652E636F6D636578701A5612AEB0636E62661A5610D9F0636961741A5610D9F063637469420B71"));
+        expect(payload).to.eql(cbor.decode("A76369737375636F61703A2F2F61732E6578616D706C652E636F6D63737562656572696B77636175647818636F61703A2F2F6C696768742E6578616D706C652E636F6D636578701A91AD78B0636E62661A5610D9F0636961741A5610D9F063637469420B71"));
     });
 });
   /**
@@ -55,13 +55,13 @@ describe(".verify", () => {
         // arrange
         const cwt = new Cborwebtoken();
         // tslint:disable-next-line:max-line-length
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
+        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b71489a40ee1da52a4a1a";
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // act
         const payload = await cwt.verify(token, Buffer.from(secret, "hex"));
         // assert
         // tslint:disable-next-line:max-line-length
-        expect(payload).to.eql("a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
+        expect(payload).to.eql("a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91AD78b0051a5610d9f0061a5610d9f007420b71");
     });
 });
   /**
@@ -78,10 +78,10 @@ describe("payloadcheck", () => {
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // tslint:disable-next-line:object-literal-sort-keys
         const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
-                          exp: 1444064944, nbf: 1443944944, iat: 1443944944,
+                          exp: 2444064944, nbf: 1443944944, iat: 1443944944,
                           cti: Buffer.from("0b71", "hex"), test: "test"};
         const payloadexpected = { 1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com",
-                                  4: 1444064944, 5: 1443944944, 6: 1443944944,
+                                  4: 2444064944, 5: 1443944944, 6: 1443944944,
                                   7: Buffer.from("0b71", "hex"), test: "test" };
         const cwt = new Cborwebtoken();
         // act
@@ -96,3 +96,15 @@ describe("payloadcheck", () => {
         expect(arr).to.eql(Object.keys(payloadexpected));
     });
 });
+/*
+describe("expirecheck", () => {
+    it("should throw an Error if the expiration Date has already passed", async () => {
+    // arrange
+    // tslint:disable-next-line:object-literal-sort-keys
+    const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
+                      exp: 2444064944, nbf: 1443944944, iat: 1443944944,
+                      cti: Buffer.from("0b71", "hex"), test: "test"};
+    const living = expirecheck(payload);
+    });
+});
+*/

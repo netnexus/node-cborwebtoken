@@ -42,9 +42,14 @@ class Cborwebtoken {
      * @param {string | Buffer} secret - The secret used to verify the token.
      */
     async verify(token, secret) {
-        let buf = await cose.mac.read(token, secret);
-        buf = buf.toString("hex");
-        return buf;
+        const payload = cbor.decode(cbor.decode(token).value[2]);
+        const exptime = payload.get(4);
+        const expired = this.expirecheck(exptime);
+        if (expired === true) {
+            let buf = await cose.mac.read(token, secret);
+            buf = buf.toString("hex");
+            return buf;
+        }
     }
     /**
      * Uses the payload to build a map with it's keys and values.
@@ -100,6 +105,16 @@ class Cborwebtoken {
             }
         }
         return n;
+    }
+    expirecheck(exptime) {
+        const date = new Date();
+        const milsec = Math.floor(date.getTime() / 1000);
+        if (exptime < milsec) {
+            throw new Error("Token expired!");
+        }
+        else {
+            return true;
+        }
     }
 }
 exports.Cborwebtoken = Cborwebtoken;

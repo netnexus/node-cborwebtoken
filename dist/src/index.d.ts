@@ -40,4 +40,5 @@ export declare class Cborwebtoken {
      * @param {Map<string |number | any>} payload - any valid mapped payload
      */
     private unBuildMap(payload);
+    private expirecheck(exptime);
 }
