@@ -2,10 +2,6 @@
     "extends": "tslint:latest",
     "rules": {
       // required for chai
-      "no-unused-expression": false,
-      "no-shadowed-variable": false,
-      "no-var-requires":false,
-      "max-line-length": false,
-      "no-unused-variable": false
+      "no-unused-expression": false
     }
   }
