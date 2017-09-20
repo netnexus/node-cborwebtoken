@@ -17,13 +17,13 @@ describe(".mac()", () => {
         const cwt = new index_1.Cborwebtoken();
         // tslint:disable-next-line:object-literal-sort-keys
         const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
-            exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex") };
+            exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex") };
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // act
         const test = await cwt.mac(payload, Buffer.from(secret, "hex"));
         // assert
         // tslint:disable-next-line:max-line-length
-        chai_1.expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b71489a40ee1da52a4a1a");
+        chai_1.expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200");
     });
 });
 /**
@@ -56,13 +56,13 @@ describe(".verify", () => {
         // arrange
         const cwt = new index_1.Cborwebtoken();
         // tslint:disable-next-line:max-line-length
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b71489a40ee1da52a4a1a";
+        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // act
         const payload = await cwt.verify(token, Buffer.from(secret, "hex"));
         // assert
         // tslint:disable-next-line:max-line-length
-        chai_1.expect(payload).to.equal("a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b71");
+        chai_1.expect(payload).to.equal("a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
     });
 });
 /**
@@ -79,10 +79,10 @@ describe("payloadcheck", () => {
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // tslint:disable-next-line:object-literal-sort-keys
         const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
-            exp: 2444064944, nbf: 1443944944, iat: 1443944944,
+            exp: 1444064944, nbf: 1443944944, iat: 1443944944,
             cti: Buffer.from("0b71", "hex"), test: "test" };
         const payloadexpected = { 1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com",
-            4: 2444064944, 5: 1443944944, 6: 1443944944,
+            4: 1444064944, 5: 1443944944, 6: 1443944944,
             7: Buffer.from("0b71", "hex"), test: "test" };
         const cwt = new index_1.Cborwebtoken();
         // act
@@ -97,16 +97,4 @@ describe("payloadcheck", () => {
         chai_1.expect(arr).to.eql(Object.keys(payloadexpected));
     });
 });
-/*
-describe("expirecheck", () => {
-    it("should throw an Error if the expiration Date has already passed", async () => {
-    // arrange
-    // tslint:disable-next-line:object-literal-sort-keys
-    const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
-                      exp: 2444064944, nbf: 1443944944, iat: 1443944944,
-                      cti: Buffer.from("0b71", "hex"), test: "test"};
-    const living = expirecheck(payload);
-    });
-});
-*/
 //# sourceMappingURL=index.spec.js.map

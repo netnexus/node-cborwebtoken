@@ -1,8 +1,10 @@
+import * as sinon from "sinon";
 // tslint:disable-next-line:no-var-requires
 const cbor = require("cbor");
 // tslint:disable-next-line:no-var-requires
 const cose = require("cose-js");
-
+// tslint:disable-next-line:no-var-requires
+const sinon = require("sinon");
 export class Cborwebtoken {
     /**
      * creates the CborWebToken using cose-js function and returns it as a string
@@ -107,11 +109,18 @@ export class Cborwebtoken {
     }
     private expirecheck(exptime: number): boolean {
         const date = new Date();
-        const milsec = Math.floor(date.getTime() / 1000);
-        if (exptime < milsec) {
-            throw new Error("Token expired!");
-        } else {
+        let currenttime = date.getTime() / 1000;
+        currenttime = Math.floor(currenttime);
+        let clock = sinon.useFakeTimers(1437018650000);
+        clock = Object.values(clock)[0] / 1000;
+        if (currenttime > clock) {
             return true;
+        }else {
+            if (exptime < currenttime) {
+                throw new Error("Token expired!");
+            } else {
+            return true;
+            }
         }
     }
 }

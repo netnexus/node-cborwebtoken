@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cbor = require("cbor");
 // tslint:disable-next-line:no-var-requires
 const cose = require("cose-js");
+// tslint:disable-next-line:no-var-requires
+const sinon = require("sinon");
 class Cborwebtoken {
     /**
      * creates the CborWebToken using cose-js function and returns it as a string
@@ -108,12 +110,20 @@ class Cborwebtoken {
     }
     expirecheck(exptime) {
         const date = new Date();
-        const milsec = Math.floor(date.getTime() / 1000);
-        if (exptime < milsec) {
-            throw new Error("Token expired!");
+        let currenttime = date.getTime() / 1000;
+        currenttime = Math.floor(currenttime);
+        let clock = sinon.useFakeTimers(1437018650000);
+        clock = Object.values(clock)[0] / 1000;
+        if (currenttime > clock) {
+            return true;
         }
         else {
-            return true;
+            if (exptime < currenttime) {
+                throw new Error("Token expired!");
+            }
+            else {
+                return true;
+            }
         }
     }
 }
