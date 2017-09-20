@@ -1,5 +1,6 @@
 # node-cborwebtoken
-https://travis-ci.org/netnexus/node-cborwebtoken.svg?branch=develop
+[![Build Status](https://travis-ci.org/netnexus/node-cborwebtoken.svg?branch=master)](https://travis-ci.org/netnexus/node-cborwebtoken)
+
 Under development, not ready for usage!
 
 An implementation of CBOR Web Tokens for node (TypeScript, JavaScript).
