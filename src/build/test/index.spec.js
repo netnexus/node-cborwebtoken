@@ -63,4 +63,4 @@ describe("payloadcheck", () => {
         chai_1.expect(arr).to.eql(Object.keys(payloadexpected));
     });
 });
-//# sourceMappingURL=prepareobject.spec.js.map
+//# sourceMappingURL=index.spec.js.map

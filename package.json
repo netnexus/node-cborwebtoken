@@ -24,6 +24,6 @@
     "typings": "^2.1.1"
   },
   "scripts": {
-    "test": "tsc && mocha ./src/build/test/prepareobject.spec.js"
+    "test": "tsc && mocha ./src/build/test/index.spec.js"
   }
 }

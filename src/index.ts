@@ -17,10 +17,7 @@ export class Cborwebtoken {
     // calls cbor.decode to decode the given Token. Returns the decoded payload without verifying if the signature is valid.
     public async decode(token: string): Promise<object> {
     const newToken = cbor.decode(token);
-    // tslint:disable-next-line:no-console
-    console.log(newToken);
     const newPayload = cbor.decode(newToken.value[2]);
-
     return this.unBuildMap(newPayload);
     }
     // also decodes the given Token but additionally checks if the signature is valid (via cose.mac.read). If not it will throw Error "Tag mismatch".
@@ -66,9 +63,6 @@ export class Cborwebtoken {
                 n[key] = payload.get(key);
             }
         }
-        // tslint:disable-next-line:no-console
-        console.log(n);
         return n;
     }
 }
-
