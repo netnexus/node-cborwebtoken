@@ -1,15 +1,13 @@
 # node-cborwebtoken
 [![Build Status](https://travis-ci.org/netnexus/node-cborwebtoken.svg?branch=develop)](https://travis-ci.org/netnexus/node-cborwebtoken)
 
-Under development, not ready for usage!
-
 An implementation of CBOR Web Tokens for node (TypeScript, JavaScript).
 
 This was developed against [draft-ietf-ace-cbor-web-token-08](https://tools.ietf.org/html/draft-ietf-ace-cbor-web-token-08).
 
 # Install
 ```bash
-$ npm install ...
+$ npm install node-cborwebtoken
 ```
 
 # Usage
