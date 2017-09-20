@@ -1,5 +1,5 @@
 # node-cborwebtoken
-[![Build Status](https://travis-ci.org/netnexus/node-cborwebtoken.svg?branch=master)](https://travis-ci.org/netnexus/node-cborwebtoken)
+[![Build Status](https://travis-ci.org/netnexus/node-cborwebtoken.svg?branch=develop)](https://travis-ci.org/netnexus/node-cborwebtoken)
 
 Under development, not ready for usage!
 
