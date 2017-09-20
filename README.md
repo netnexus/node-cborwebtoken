@@ -1,5 +1,5 @@
 # node-cborwebtoken
-[![Build Status](https://travis-ci.org/netnexus/node-cborwebtoken.svg?branch=develop)](https://travis-ci.org/netnexus/node-cborwebtoken)
+[![Build Status](https://travis-ci.org/netnexus/node-cborwebtoken.svg?branch=master)](https://travis-ci.org/netnexus/node-cborwebtoken)
 
 An implementation of CBOR Web Tokens for node (TypeScript, JavaScript).
 
@@ -42,7 +42,7 @@ Returns the decoded payload without verifying if the signature is valid.
 Example:
 ```js
 const decodeTest = cwt.decode(token).then((decodeTest) => {
-  //  console.log(decodeTest);
+    console.log(decodeTest);
 });
 ```
 
