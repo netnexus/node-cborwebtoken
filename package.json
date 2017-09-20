@@ -1,5 +1,5 @@
 {
-  "name": "node-cborwebtoken",
+  "name": "@netnexus/node-cborwebtoken",
   "version": "0.0.2",
   "description": "Implementation of CBOR Web Tokens for node",
   "main": "../src/build/src/index.js",
@@ -7,7 +7,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/netnexus/node-cborwebtoken"
+    "url": "https://github.com/netnexus/node-cborwebtoken.git"
   },
   "dependencies": {
     "cbor": "3.0.3",
@@ -26,5 +26,18 @@
   },
   "scripts": {
     "test": "tsc && mocha ./src/build/test/index.spec.js"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/netnexus/node-cborwebtoken/issues"
+  },
+  "homepage": "https://github.com/netnexus/node-cborwebtoken#readme",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "cwt",
+    "node",
+    "cbor",
+    "cborwebtoken"
+  ]
 }

@@ -7,7 +7,7 @@ This was developed against [draft-ietf-ace-cbor-web-token-08](https://tools.ietf
 
 # Install
 ```bash
-$ npm install node-cborwebtoken
+$ npm install @netnexus/node-cborwebtoken
 ```
 
 # Usage
