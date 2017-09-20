@@ -1,5 +1,5 @@
 {
-  "name": "@netnexus/node-cborwebtoken",
+  "name": "node-cborwebtoken",
   "version": "0.1.3",
   "description": "Implementation of CBOR Web Tokens for node",
   "main": "../src/build/src/index.js",
