@@ -1,5 +1,5 @@
 {
-  "name": "node-cborwebtoken",
+  "name": "@netnexus/node-cborwebtoken",
   "version": "0.1.0",
   "description": "Implementation of CBOR Web Tokens for node",
   "main": "../src/build/src/index.js",
@@ -21,6 +21,7 @@
     "@types/nock": "~8.2.1",
     "chai": "4.1.2",
     "mocha": "~3.5.0",
+    "node-cborwebtoken": "0.1.0",
     "ts-node": "^3.3.0",
     "typings": "^2.1.1"
   },
