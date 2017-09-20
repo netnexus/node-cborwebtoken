@@ -26,7 +26,7 @@ export class Cborwebtoken {
     }
   /**
    * Simple test to check if "cwt.decode" is working properly.
-   * It does not check the validiity of the signature and thus just returns the decoded payload.
+   * It does not check the validity of the signature and thus just returns the decoded payload.
    * As we want the payload to have it's original values we also call the unBuildMap function
    * (with 'newPayload' as parameter) in the return statement
    * @param {obj} token - The token to be decoded.
