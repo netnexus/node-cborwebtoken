@@ -4,119 +4,118 @@ import { TokenError } from "./errors/TokenError.class";
 const cbor = require("cbor");
 // tslint:disable-next-line:no-var-requires
 const cose = require("cose-js");
-// tslint:disable-next-line:no-var-requires
 
 export class Cborwebtoken {
-    public claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
-    public swap() {
-        const claims = this.claims;
-        const ret = {};
-        // tslint:disable-next-line:forin
-        for (const key in claims) {
-            ret[claims[key]] = key;
-        }
-        return ret;
-    }
+    /**
+     * Tag for CWT
+     */
+    private static CWT_TAG = Buffer.from("d83d", "hex");
 
     /**
-     * creates the CborWebToken using cose-js function and returns it as a string
-     * @param {obj} payload - The token which is going to be verified by using cose.mac.create
-     * @param {string | Buffer} secret -
-     * The Secret that's being fed into cose.mac.create (alongside payload) in order to build a cwt.
+     * @see https://tools.ietf.org/html/draft-ietf-ace-cbor-web-token-08#section-4
      */
-    public async mac(payload: object, secret: string | Buffer): Promise<Buffer> {
-        const mappedPayload = cbor.encode(this.buildMap(payload));
-        let buf = await cose.mac.create(
+    private claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
+
+    /**
+     * Create a CborWebToken and return it as a base64 encoded string.
+     *
+     * @param {any} payload - data which should be included into the token.
+     * @param {string | Buffer} secret - a private secret.
+     */
+    public async mac(payload: any, secret: string | Buffer): Promise<string> {
+        const mappedPayload = cbor.encode(this.translateClaims(payload));
+        const buf = await cose.mac.create(
             { p: { alg: "SHA-256_64" } },
             mappedPayload,
             [{ key: secret }]);
-        buf = buf.toString("hex");
-        /**
-         * adding prefix "d83d" (61). As the CWTs are MACed (payload of type COSE_Mac0) -
-         * COSE Mac w/o Recipient Object - we always use prefix 61.
-         */
-        buf = "d83d" + buf;
-        return buf;
+        return Buffer.concat([Cborwebtoken.CWT_TAG, buf]).toString("base64");
     }
-    /**
-     * Simple test to check if "cwt.decode" is working properly.
-     * It does not check the validity of the signature and thus just returns the decoded payload.
-     * As we want the payload to have it's original values we also call the unBuildMap function
-     * (with 'newPayload' as parameter) in the return statement
-     * @param {obj} token - The token to be decoded.
-     */
 
-    public async decode(token: string): Promise<object> {
-        const newToken = cbor.decode(token);
+    /**
+     * Return decoded payload of a token. Method does not check the validity of the
+     * signature and thus just returns the decoded payload.
+     *
+     * @param {string} token - The token to be decoded as a base64 encoded string.
+     */
+    public decode(token: string): any {
+        const newToken = cbor.decode(Buffer.from(token, "base64").slice(2));
         const newPayload = cbor.decode(newToken.value[2]);
-        return this.unBuildMap(newPayload);
-    }
-    /**
-     * Calling function 'cose.mac.read' with our token and it's secret as parameters.
-     * This will deliver either a 'Tag mismatch' Error,
-     * or in case of no error the confirmation that the token is valid.
-     * @param {obj} token - The token to be decoded and verified.
-     * @param {string | Buffer} secret - The secret used to verify the token.
-     */
-    public async verify(token: string | Buffer | object, secret: string | Buffer): Promise<Buffer> {
-        const payload = cbor.decode(cbor.decode(token).value[2]);
-        const exptime = payload.get(4);
-        const expired = this.expirecheck(exptime);
-        if (expired === true) {
-                let buf = await cose.mac.read(token, secret);
-                buf = buf.toString("hex");
-                return buf;
-        }
+        return this.revertClaims(newPayload);
     }
 
     /**
-     * Uses the payload to build a map with it's keys and values.
-     * Then replaces the original keys by using claim's values as new key if the original keys are the same.
-     * Finally returns the CBOR encoded map consisting of data of types string, number or any
-     * @param {any} obj - any valid payload
-     * if the key exists as key in "claims" we use the value (e.g. 1 for iss) for the creation of the map.
-     * otherwise we simply keep the key (e.g. "test" is not in claims, so it stays the same).
-     * to trigger the KeyError replace a payload key in mac- or checkpayload-tests with a number from 1-7
+     * Check token signature and exp and return payload or throw an error if validation
+     * fails.
+     *
+     * @param {string} token - The base64 encoded token to be decoded and verified.
+     * @param {string | Buffer} secret - The secret used to encode the token.
      */
-    private buildMap(obj: any): Map<string | number, any> {
-        const claims = this.claims;
-        const m = new Map();
-        for (const key of Object.keys(obj)) {
-            if ((Object.values(claims).toString()).includes(key.toString())) {
-                throw new KeyError("invalid payload key");
-            }
-            m.set(claims[key] ? claims[key] : key, obj[key]);
-        }
-        return m;
+    public async verify(token: string, secret: string | Buffer): Promise<any> {
+        const payload = cbor.decode(await cose.mac.read(Buffer.from(token, "base64").slice(2), secret));
+        const exptime = payload.get(4);
+        this.isExpired(exptime);
+        return this.revertClaims(payload);
     }
+
     /**
-     * Uses the payload of the previously build map to revert the changes to it's keys.
-     * By restricting the use of numbers 1-7 as in the payload prior to building it
-     * it is prevented that we have a duplicate there.
-     * Thus we can revert any changes concerning those numbers by using the "claimsreturn" object beneath.
-     * It can be considered the inverse function of buildmap.
-     * Finally returns an object 'n' which is the original payload, before building a map.
-     * @param {Map<string |number | any>} payload - any valid mapped payload
+     * Keys in obj which are claims will be replaced with numbers. E.g. {iss: "test"} will
+     * become Map {1 => "test"}
+     *
+     * @param {any} obj payload
      */
-    private unBuildMap(payload: Map<string | number, any>): any {
-        const claimsreturn = this.swap();
-        const n = {};
-        for (const key of payload.keys()) {
-            if (claimsreturn[key]) {
-                n[claimsreturn[key]] = payload.get(key);
+    private translateClaims(obj: any): Map<string | number, any> {
+        const result = new Map();
+        for (const key of Object.keys(obj)) {
+            if ((Object.values(this.claims).toString()).includes(key.toString())) {
+                throw new KeyError("Invalid payload key");
+            }
+            result.set(this.claims[key] ? this.claims[key] : key, obj[key]);
+        }
+        return result;
+    }
+
+    /**
+     * Revert replacement of claims keys with numbers. E.g. Map {1 => "test"} will
+     * become {iss: "test"}.
+     *
+     * @param {object} obj payload
+     */
+    private revertClaims(obj: Map<string | number, any>): any {
+        const swappedClaims = this.swap(this.claims);
+        const result = {};
+        for (const key of obj.keys()) {
+            if (swappedClaims[key]) {
+                result[swappedClaims[key]] = obj.get(key);
             } else {
-                n[key] = payload.get(key);
+                result[key] = obj.get(key);
             }
         }
-        return n;
+        return result;
     }
-    private expirecheck(exptime: number): boolean {
-        const date = new Date();
-        let currenttime = date.getTime() / 1000;
-        currenttime = Math.floor(currenttime);
-        if (exptime < currenttime) {
+
+    /**
+     * Helper to check if a timestamp is expired.
+     *
+     * @param {number} ts timestamp
+     */
+    private isExpired(ts: number): void {
+        const now = Math.floor((new Date()).getTime() / 1000);
+        if (ts < now) {
             throw new TokenError("Token expired!");
         }
-        return true;
-        }
     }
+
+    /**
+     * Helper to invert objects: {1: "iss"} becomes {"iss": 1}.
+     *
+     * @param {any} obj
+     */
+    private swap(obj) {
+        const ret = {};
+        // tslint:disable-next-line:forin
+        for (const key in obj) {
+            ret[obj[key]] = key;
+        }
+        return ret;
+    }
+}

@@ -1,107 +1,103 @@
+// tslint:disable:object-literal-sort-keys
+
 import { expect } from "chai";
 import "mocha";
-import * as sinon from "sinon";
 import { Cborwebtoken } from "../src/index";
 // tslint:disable-next-line:no-var-requires
 const cbor = require("cbor");
 
-  /**
-   * creates the CborWebToken using cose-js function and returns it as a string
-   * @param {obj} payload - The payload that is handed over in Order to be macced with the secret.
-   * @param {string} secret -
-   * The Secret that's being fed into cose.mac.create (alongside payload) in order to build a cwt.
-   */
-describe(".mac()", () => {
+describe("#mac", () => {
     it("should return the CborWebToken as a string", async () => {
         // arrange
         const cwt = new Cborwebtoken();
-        // tslint:disable-next-line:object-literal-sort-keys
-        const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
-                          exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex") };
-        const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
-        // act
-        const test =  await cwt.mac(payload, Buffer.from(secret, "hex"));
-        // assert
-        expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d0"
-        + "2656572696b77037818636f61703a2f2f6c696768742e657861"
-        + "6d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200");
-    });
-});
-  /**
-   * Simple test to check if "cwt.decode" is working properly.
-   * It does not check the validiity of the signature and thus just returns the decoded payload.
-   * @param {obj} token - The token to be decoded.
-   */
-describe(".decode()", () => {
-    it("should return the payload without verifying if the signature is valid", async () => {
-        // arrange
-        const cwt = new Cborwebtoken();
+        const payload = {
+            iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
+            exp: 1444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"),
+        };
+        const secret = Buffer.from("403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388", "hex");
 
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d0"
-        + "2656572696b77037818636f61703a2f2f6c696768742e657861"
-        + "6d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
         // act
-        const payload = await cwt.decode(token);
+        const token = await cwt.mac(payload, secret);
+
         // assert
-        expect(payload).to.eql(cbor.decode("A76369737375636F61703A2F2F61732E6578616D706C65"
-        + "2E636F6D63737562656572696B77636175647818636F61703A2F2F6C696768742E6"
-        + "578616D706C652E636F6D636578701A91ad78B0636E62661A5610D9F0636961741A5610D9F063637469420B71"));
+        const expectedBase64 = Buffer.from("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d0"
+            + "2656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d"
+            + "9f007420b7148093101ef6d789200", "hex")
+            .toString("base64");
+        expect(token).to.eql(expectedBase64);
     });
-});
-  /**
-   * Checks if the signature is valid by calling "cwt.verify".
-   * If it is, the payload is returned, if not it throws an Error "Tag mismatch".
-   * @param {obj} token - The token which is going to be verified by using cose.mac.read
-   * @param {string} secret -
-   * The Secret that's being fed into cose.mac.read (alongside token) in order to decode and verify it.
-   */
-describe(".verify()", () => {
-    it("should return the payload if the signature is valid. If not it will throw an Error", async () => {
-        // arrange
-        const cwt = new Cborwebtoken();
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b770378"
-        + "18636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb"
-        + "0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
-        const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
-        // act
-        const clock = sinon.useFakeTimers(1437018650000);
-        const payload = await cwt.verify(token, Buffer.from(secret, "hex"));
-        // assert
-        expect(payload).to.equal("a70175636f61703a2f2f61732e6578616d706c652e636f6d026565"
-        + "72696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
-        // restore
-        clock.restore();
-    });
-});
-  /**
-   * building a cwt from the ground by handing over payload and secret to "cwt.mac".
-   * You then decode the CWT and compare it's payload with the expected one,
-   * where the keys should be replaced by the given numbers in payloadexpected (via cwt.mac).
-   * @param {obj} token - The token which is going to be verified by using cose.mac.read
-   * @param {string} secret -
-   * The Secret that's being fed into cose.mac.read (alongside token) in order to decode and verify it.
-   */
-describe("payloadcheck", () => {
     it("should replace payload keys", async () => {
         // arrange
-        const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
-        // tslint:disable-next-line:object-literal-sort-keys
-        const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
-                          exp: 1444064944, nbf: 1443944944, iat: 1443944944,
-                          cti: Buffer.from("0b71", "hex"), test: "test"};
-        const payloadexpected = { 1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com",
-                                  4: 1444064944, 5: 1443944944, 6: 1443944944,
-                                  7: Buffer.from("0b71", "hex"), test: "test" };
+        const secret = "my-secret";
+        const payload = {
+            iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
+            exp: 1444064944, nbf: 1443944944, iat: 1443944944,
+            cti: Buffer.from("0b71", "hex"), test: "test",
+        };
+        const payloadexpected = {
+            1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com",
+            4: 1444064944, 5: 1443944944, 6: 1443944944,
+            7: Buffer.from("0b71", "hex"), test: "test",
+        };
         const cwt = new Cborwebtoken();
+
         // act
-        const token =  await cwt.mac(payload, Buffer.from(secret, "hex"));
+        const token = await cwt.mac(payload, secret);
+
         // assert
-        const decodedcwt = cbor.decode(token);
+        const decodedcwt = cbor.decode(Buffer.from(token, "base64"));
         const actualpayload = cbor.decode(decodedcwt.value.value[2]);
         const arr = [];
-        for (const key of Array.from(actualpayload.keys())){
+        for (const key of Array.from(actualpayload.keys())) {
             arr.push(key.toString());
         }
         expect(arr).to.eql(Object.keys(payloadexpected));
     });
+
+    // TODO: Add test that keys like 1 in the payload throw an error when calling cwt.mac
+});
+
+describe("#decode", () => {
+    it("should return the payload without verifying if the signature is valid", async () => {
+        // arrange
+        const cwt = new Cborwebtoken();
+        const token = "2D3RhEOhAQSgWFCnAXVjb2FwOi8vYXMuZXhhbXBsZS5jb20CZWVyaWt3A3gYY29hcDovL2x"
+            + "pZ2h0LmV4YW1wbGUuY29tBBqRrXiwBRpWENnwBhpWENnwB0ILcUgJMQHvbXiSAA==";
+
+        // act
+        const payload = await cwt.decode(token);
+
+        // assert
+        expect(payload).to.eql({
+            iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
+            exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"),
+        });
+    });
+
+    // TODO: Add test with reverting payload keys back
+});
+
+describe("#verify", () => {
+    it("should return the payload if the signature is valid", async () => {
+        // arrange
+        const cwt = new Cborwebtoken();
+        const payload = {
+            iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
+            exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"),
+        };
+        const secret = "my-secret";
+        const token = await cwt.mac(payload, secret);
+
+        // act
+        const verifiedPayload = await cwt.verify(token, secret);
+
+        // assert
+        expect(verifiedPayload).to.eql(payload);
+    });
+
+    // TODO: Add test with failing signature (should throw TokenError)
+
+    // TODO: Add test with failing exp (should throw KeyError)
+
+    // TODO: Add test without a exp
 });
