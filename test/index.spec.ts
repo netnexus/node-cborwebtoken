@@ -21,8 +21,9 @@ describe(".mac()", () => {
         // act
         const test =  await cwt.mac(payload, Buffer.from(secret, "hex"));
         // assert
-        // tslint:disable-next-line:max-line-length
-        expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200");
+        expect(test).to.eql("d83dd18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d0"
+        + "2656572696b77037818636f61703a2f2f6c696768742e657861"
+        + "6d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200");
     });
 });
   /**
@@ -30,17 +31,20 @@ describe(".mac()", () => {
    * It does not check the validiity of the signature and thus just returns the decoded payload.
    * @param {obj} token - The token to be decoded.
    */
-describe(".decode", () => {
+describe(".decode()", () => {
     it("should return the payload without verifying if the signature is valid", async () => {
         // arrange
         const cwt = new Cborwebtoken();
-        // tslint:disable-next-line:max-line-length
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
+
+        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d0"
+        + "2656572696b77037818636f61703a2f2f6c696768742e657861"
+        + "6d706c652e636f6d041a91ad78b0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
         // act
         const payload = await cwt.decode(token);
         // assert
-        // tslint:disable-next-line:max-line-length
-        expect(payload).to.eql(cbor.decode("A76369737375636F61703A2F2F61732E6578616D706C652E636F6D63737562656572696B77636175647818636F61703A2F2F6C696768742E6578616D706C652E636F6D636578701A91ad78B0636E62661A5610D9F0636961741A5610D9F063637469420B71"));
+        expect(payload).to.eql(cbor.decode("A76369737375636F61703A2F2F61732E6578616D706C65"
+        + "2E636F6D63737562656572696B77636175647818636F61703A2F2F6C696768742E6"
+        + "578616D706C652E636F6D636578701A91ad78B0636E62661A5610D9F0636961741A5610D9F063637469420B71"));
     });
 });
   /**
@@ -50,18 +54,21 @@ describe(".decode", () => {
    * @param {string} secret -
    * The Secret that's being fed into cose.mac.read (alongside token) in order to decode and verify it.
    */
-describe(".verify", () => {
+describe(".verify()", () => {
     it("should return the payload if the signature is valid. If not it will throw an Error", async () => {
         // arrange
         const cwt = new Cborwebtoken();
-        // tslint:disable-next-line:max-line-length
-        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
+
+        const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b770378"
+        + "18636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb"
+        + "0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // act
         const payload = await cwt.verify(token, Buffer.from(secret, "hex"));
         // assert
-        // tslint:disable-next-line:max-line-length
-        expect(payload).to.equal("a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
+
+        expect(payload).to.equal("a70175636f61703a2f2f61732e6578616d706c652e636f6d026565"
+        + "72696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
     });
 });
   /**
