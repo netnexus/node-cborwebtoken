@@ -79,10 +79,10 @@ describe("payloadcheck", () => {
         // tslint:disable-next-line:object-literal-sort-keys
         const payload = { iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
                           exp: 1444064944, nbf: 1443944944, iat: 1443944944,
-                          cti: Buffer.from("0b71", "hex"), test: "test"};
+                          cti: Buffer.from("0b71", "hex"), "test": "test"};
         const payloadexpected = { 1: "coap://as.example.com", 2: "erikw", 3: "coap://light.example.com",
                                   4: 1444064944, 5: 1443944944, 6: 1443944944,
-                                  7: Buffer.from("0b71", "hex"), test: "test" };
+                                  7: Buffer.from("0b71", "hex"), "test": "test" };
         const cwt = new Cborwebtoken();
         // act
         const token =  await cwt.mac(payload, Buffer.from(secret, "hex"));

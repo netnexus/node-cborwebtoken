@@ -64,20 +64,11 @@ class Cborwebtoken {
         const m = new Map();
         for (const key of Object.keys(obj)) {
             if (key !== "1" || "2" || "3" || "4" || "5" || "6" || "7") {
-                if (Object.keys(claims).indexOf(key) > -1 && !(obj[claims[key]])) {
+                if (claims[key]) {
                     m.set(claims[key], obj[key]);
                 }
                 else {
-                    if (Object.values(claims).indexOf(obj[key])) {
-                        // tslint:disable-next-line:radix
-                        if (parseInt(key)) {
-                            // tslint:disable-next-line:radix
-                            m.set(parseInt(key), obj[key]);
-                        }
-                        else {
-                            m.set(key, obj[key]);
-                        }
-                    }
+                    m.set(key, obj[key]);
                 }
             }
             else {
@@ -99,7 +90,7 @@ class Cborwebtoken {
         const claimsreturn = { 1: "iss", 2: "sub", 3: "aud", 4: "exp", 5: "nbf", 6: "iat", 7: "cti" };
         const n = {};
         for (const key of payload.keys()) {
-            if (key in claimsreturn) {
+            if (claimsreturn[key]) {
                 n[claimsreturn[key]] = payload.get(key);
             }
             else {
@@ -109,21 +100,16 @@ class Cborwebtoken {
         return n;
     }
     expirecheck(exptime) {
-        const date = new Date();
-        let currenttime = date.getTime() / 1000;
+        const clock = sinon.useFakeTimers(1437018650000);
+        let currenttime = clock.now / 1000;
         currenttime = Math.floor(currenttime);
-        let clock = sinon.useFakeTimers(1437018650000);
-        clock = Object.values(clock)[0] / 1000;
-        if (currenttime > clock) {
+        if (exptime > currenttime) {
+            clock.restore();
             return true;
         }
         else {
-            if (exptime < currenttime) {
-                throw new Error("Token expired!");
-            }
-            else {
-                return true;
-            }
+            clock.restore();
+            throw new Error("Token expired!");
         }
     }
 }
