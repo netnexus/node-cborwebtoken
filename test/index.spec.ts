@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import "mocha";
+import * as sinon from "sinon";
 import { Cborwebtoken } from "../src/index";
 // tslint:disable-next-line:no-var-requires
 const cbor = require("cbor");
@@ -58,17 +59,18 @@ describe(".verify()", () => {
     it("should return the payload if the signature is valid. If not it will throw an Error", async () => {
         // arrange
         const cwt = new Cborwebtoken();
-
         const token = "d18443a10104a05850a70175636f61703a2f2f61732e6578616d706c652e636f6d02656572696b770378"
         + "18636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb"
         + "0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // act
+        const clock = sinon.useFakeTimers(1437018650000);
         const payload = await cwt.verify(token, Buffer.from(secret, "hex"));
         // assert
-
         expect(payload).to.equal("a70175636f61703a2f2f61732e6578616d706c652e636f6d026565"
         + "72696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
+        // restore
+        clock.restore();
     });
 });
   /**

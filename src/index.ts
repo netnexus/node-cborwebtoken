@@ -1,4 +1,3 @@
-import * as sinon from "sinon";
 import { KeyError } from "./errors/KeyError.class";
 import { TokenError } from "./errors/TokenError.class";
 // tslint:disable-next-line:no-var-requires
@@ -6,8 +5,19 @@ const cbor = require("cbor");
 // tslint:disable-next-line:no-var-requires
 const cose = require("cose-js");
 // tslint:disable-next-line:no-var-requires
-const sinon = require("sinon");
+
 export class Cborwebtoken {
+    public claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
+    public swap() {
+        const claims = this.claims;
+        const ret = {};
+        // tslint:disable-next-line:forin
+        for (const key in claims) {
+            ret[claims[key]] = key;
+        }
+        return ret;
+    }
+
     /**
      * creates the CborWebToken using cose-js function and returns it as a string
      * @param {obj} payload - The token which is going to be verified by using cose.mac.create
@@ -69,11 +79,10 @@ export class Cborwebtoken {
      * to trigger the KeyError replace a payload key in mac- or checkpayload-tests with a number from 1-7
      */
     private buildMap(obj: any): Map<string | number, any> {
-        const claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
-        const arr = ["1", "2", "3", "4", "5", "6", "7"];
+        const claims = this.claims;
         const m = new Map();
         for (const key of Object.keys(obj)) {
-            if (arr.includes(key.toString())) {
+            if ((Object.values(claims).toString()).includes(key.toString())) {
                 throw new KeyError("invalid payload key");
             }
             m.set(claims[key] ? claims[key] : key, obj[key]);
@@ -90,7 +99,7 @@ export class Cborwebtoken {
      * @param {Map<string |number | any>} payload - any valid mapped payload
      */
     private unBuildMap(payload: Map<string | number, any>): any {
-        const claimsreturn = { 1: "iss", 2: "sub", 3: "aud", 4: "exp", 5: "nbf", 6: "iat", 7: "cti" };
+        const claimsreturn = this.swap();
         const n = {};
         for (const key of payload.keys()) {
             if (claimsreturn[key]) {
@@ -102,15 +111,12 @@ export class Cborwebtoken {
         return n;
     }
     private expirecheck(exptime: number): boolean {
-        const clock = sinon.useFakeTimers(1437018650000);
-        let currenttime = clock.now / 1000;
+        const date = new Date();
+        let currenttime = date.getTime() / 1000;
         currenttime = Math.floor(currenttime);
-        if (exptime > currenttime) {
-            clock.restore();
-            return true;
-        }else {
-            clock.restore();
+        if (exptime < currenttime) {
             throw new TokenError("Token expired!");
-            }
+        }
+        return true;
         }
     }

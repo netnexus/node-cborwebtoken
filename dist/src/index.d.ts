@@ -1,5 +1,15 @@
 /// <reference types="node" />
 export declare class Cborwebtoken {
+    claims: {
+        iss: number;
+        sub: number;
+        aud: number;
+        exp: number;
+        nbf: number;
+        iat: number;
+        cti: number;
+    };
+    swap(): {};
     /**
      * creates the CborWebToken using cose-js function and returns it as a string
      * @param {obj} payload - The token which is going to be verified by using cose.mac.create

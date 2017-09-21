@@ -7,8 +7,19 @@ const cbor = require("cbor");
 // tslint:disable-next-line:no-var-requires
 const cose = require("cose-js");
 // tslint:disable-next-line:no-var-requires
-const sinon = require("sinon");
 class Cborwebtoken {
+    constructor() {
+        this.claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
+    }
+    swap() {
+        const claims = this.claims;
+        const ret = {};
+        // tslint:disable-next-line:forin
+        for (const key in claims) {
+            ret[claims[key]] = key;
+        }
+        return ret;
+    }
     /**
      * creates the CborWebToken using cose-js function and returns it as a string
      * @param {obj} payload - The token which is going to be verified by using cose.mac.create
@@ -65,11 +76,10 @@ class Cborwebtoken {
      * to trigger the KeyError replace a payload key in mac- or checkpayload-tests with a number from 1-7
      */
     buildMap(obj) {
-        const claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
-        const arr = ["1", "2", "3", "4", "5", "6", "7"];
+        const claims = this.claims;
         const m = new Map();
         for (const key of Object.keys(obj)) {
-            if (arr.includes(key.toString())) {
+            if ((Object.values(claims).toString()).includes(key.toString())) {
                 throw new KeyError_class_1.KeyError("invalid payload key");
             }
             m.set(claims[key] ? claims[key] : key, obj[key]);
@@ -86,7 +96,7 @@ class Cborwebtoken {
      * @param {Map<string |number | any>} payload - any valid mapped payload
      */
     unBuildMap(payload) {
-        const claimsreturn = { 1: "iss", 2: "sub", 3: "aud", 4: "exp", 5: "nbf", 6: "iat", 7: "cti" };
+        const claimsreturn = this.swap();
         const n = {};
         for (const key of payload.keys()) {
             if (claimsreturn[key]) {
@@ -99,17 +109,13 @@ class Cborwebtoken {
         return n;
     }
     expirecheck(exptime) {
-        const clock = sinon.useFakeTimers(1437018650000);
-        let currenttime = clock.now / 1000;
+        const date = new Date();
+        let currenttime = date.getTime() / 1000;
         currenttime = Math.floor(currenttime);
-        if (exptime > currenttime) {
-            clock.restore();
-            return true;
-        }
-        else {
-            clock.restore();
+        if (exptime < currenttime) {
             throw new TokenError_class_1.TokenError("Token expired!");
         }
+        return true;
     }
 }
 exports.Cborwebtoken = Cborwebtoken;

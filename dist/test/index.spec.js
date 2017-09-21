@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
 require("mocha");
+const sinon = require("sinon");
 const index_1 = require("../src/index");
 // tslint:disable-next-line:no-var-requires
 const cbor = require("cbor");
@@ -63,10 +64,13 @@ describe(".verify()", () => {
             + "0051a5610d9f0061a5610d9f007420b7148093101ef6d789200";
         const secret = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388";
         // act
+        const clock = sinon.useFakeTimers(1437018650000);
         const payload = await cwt.verify(token, Buffer.from(secret, "hex"));
         // assert
         chai_1.expect(payload).to.equal("a70175636f61703a2f2f61732e6578616d706c652e636f6d026565"
             + "72696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d9f007420b71");
+        // restore
+        clock.restore();
     });
 });
 /**

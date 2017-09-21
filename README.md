@@ -51,8 +51,12 @@ const decodeTest = cwt.decode(token).then((decodeTest) => {
 });
 ```
 
-# Errors:
-Possible thrown Erros during verification. Tags might mismatch or the data handed to the functions might be invalid.
+# Errors
+Possible thrown Erros during verification. 
+- Tag mismtach thrown by cose.mac
+- KeyError in case a payload Key is invalid
+- TokenError in case the Token is expired
+
 
 # Algorithms supported
 SHA-256_64
