@@ -1,4 +1,6 @@
 import * as sinon from "sinon";
+import { KeyError } from "./errors/KeyError.class";
+import { TokenError } from "./errors/TokenError.class";
 // tslint:disable-next-line:no-var-requires
 const cbor = require("cbor");
 // tslint:disable-next-line:no-var-requires
@@ -62,20 +64,19 @@ export class Cborwebtoken {
      * Then replaces the original keys by using claim's values as new key if the original keys are the same.
      * Finally returns the CBOR encoded map consisting of data of types string, number or any
      * @param {any} obj - any valid payload
+     * if the key exists as key in "claims" we use the value (e.g. 1 for iss) for the creation of the map.
+     * otherwise we simply keep the key (e.g. "test" is not in claims, so it stays the same).
+     * to trigger the KeyError replace a payload key in mac- or checkpayload-tests with a number from 1-7
      */
     private buildMap(obj: any): Map<string | number, any> {
         const claims = { iss: 1, sub: 2, aud: 3, exp: 4, nbf: 5, iat: 6, cti: 7 };
+        const arr = ["1", "2", "3", "4", "5", "6", "7"];
         const m = new Map();
         for (const key of Object.keys(obj)) {
-            if (key !== "1" || "2" || "3" || "4" || "5" || "6" || "7") {
-                if (claims[key]) {
-                    m.set(claims[key], obj[key]);
-                }else {
-                    m.set (key, obj[key]);
-                }
-            } else {
-                throw new Error("one or more keys are in range of 0-7 which is not allowed");
+            if (arr.includes(key.toString())) {
+                throw new KeyError("invalid payload key");
             }
+            m.set(claims[key] ? claims[key] : key, obj[key]);
         }
         return m;
     }
@@ -109,7 +110,7 @@ export class Cborwebtoken {
             return true;
         }else {
             clock.restore();
-            throw new Error("Token expired!");
+            throw new TokenError("Token expired!");
             }
         }
     }

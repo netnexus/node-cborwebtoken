@@ -28,6 +28,9 @@ export declare class Cborwebtoken {
      * Then replaces the original keys by using claim's values as new key if the original keys are the same.
      * Finally returns the CBOR encoded map consisting of data of types string, number or any
      * @param {any} obj - any valid payload
+     * if the key exists as key in "claims" we use the value (e.g. 1 for iss) for the creation of the map.
+     * otherwise we simply keep the key (e.g. "test" is not in claims, so it stays the same).
+     * to trigger the KeyError replace a payload key in mac- or checkpayload-tests with a number from 1-7
      */
     private buildMap(obj);
     /**
