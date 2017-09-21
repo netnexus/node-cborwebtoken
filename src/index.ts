@@ -50,7 +50,7 @@ export class Cborwebtoken {
         const payload = cbor.decode(cbor.decode(token).value[2]);
         const exptime = payload.get(4);
         const expired = this.expirecheck(exptime);
-        if (expired === true) {   
+        if (expired === true) {
                 let buf = await cose.mac.read(token, secret);
                 buf = buf.toString("hex");
                 return buf;
@@ -68,11 +68,11 @@ export class Cborwebtoken {
         const m = new Map();
         for (const key of Object.keys(obj)) {
             if (key !== "1" || "2" || "3" || "4" || "5" || "6" || "7") {
-                if(claims[key]){
-                    m.set(claims[key], obj[key]);    
-                }else{
-                    m.set(key,obj[key]);
-                }         
+                if (claims[key]) {
+                    m.set(claims[key], obj[key]);
+                }else {
+                    m.set (key, obj[key]);
+                }
             } else {
                 throw new Error("one or more keys are in range of 0-7 which is not allowed");
             }
