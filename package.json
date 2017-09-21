@@ -13,7 +13,6 @@
   "dependencies": {
     "cbor": "3.0.3",
     "cose-js": "https://github.com/netnexus/cose-js.git",
-    "crypto": "1.0.1",
     "tslint": "^5.7.0",
     "typescript": "~2.4.2"
   },
