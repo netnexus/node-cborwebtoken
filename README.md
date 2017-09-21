@@ -49,7 +49,7 @@ Example:
 const token = "2D3RhEOhAQSgWFCnAXVjb2FwOi8vYXMuZXhhbXBsZS5jb20CZWVyaWt3A3gYY29hcDovL2x"
     + "pZ2h0LmV4YW1wbGUuY29tBBqRrXiwBRpWENnwBhpWENnwB0ILcUgJMQHvbXiSAA==";
 const payload = cwt.decode(token);
-console.log(decodeTest);
+console.log(payload);
 ```
 
 # Errors
