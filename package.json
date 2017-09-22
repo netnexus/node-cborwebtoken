@@ -2,8 +2,8 @@
   "name": "@netnexus/node-cborwebtoken",
   "version": "2.0.3",
   "description": "Implementation of CBOR Web Tokens for node",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
   "author": "NetNexus",
   "license": "ISC",
   "repository": {
@@ -12,16 +12,21 @@
   },
   "dependencies": {
     "cbor": "3.0.3",
-    "cose-js": "https://github.com/netnexus/cose-js.git",
-    "tslint": "^5.7.0",
-    "typescript": "~2.4.2"
+    "cose-js": "https://github.com/netnexus/cose-js.git"
   },
+  "files": [
+    "dist/",
+    "typings/",
+    "index.js"
+  ],
   "devDependencies": {
     "@types/mocha": "^2.2.43",
     "@types/node": "8.0.28",
     "chai": "4.1.2",
     "mocha": "~3.5.0",
-    "types": "0.1.1"
+    "tslint": "^5.7.0",
+    "types": "0.1.1",
+    "typescript": "~2.4.2"
   },
   "scripts": {
     "test": "tslint -p . && tsc && mocha ./dist/test/*.spec.js"
