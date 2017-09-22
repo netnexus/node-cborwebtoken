@@ -33,6 +33,9 @@ class Cborwebtoken {
     decode(token) {
         const newToken = cbor.decode(Buffer.from(token, "base64").slice(2));
         const newPayload = cbor.decode(newToken.value[2]);
+        if (!(newPayload instanceof Map)) {
+            return newPayload;
+        }
         return this.revertClaims(newPayload);
     }
     /**
@@ -44,6 +47,9 @@ class Cborwebtoken {
      */
     async verify(token, secret) {
         const payload = cbor.decode(await cose.mac.read(Buffer.from(token, "base64").slice(2), secret));
+        if (!(payload instanceof Map)) {
+            return payload;
+        }
         const exptime = payload.get(4);
         this.isExpired(exptime);
         return this.revertClaims(payload);

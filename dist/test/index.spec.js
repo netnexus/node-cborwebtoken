@@ -1,8 +1,10 @@
 "use strict";
-// tslint:disable:object-literal-sort-keys
 Object.defineProperty(exports, "__esModule", { value: true });
+// tslint:disable:object-literal-sort-keys
 const chai_1 = require("chai");
 require("mocha");
+const KeyError_class_1 = require("../src/errors/KeyError.class");
+const TokenError_class_1 = require("../src/errors/TokenError.class");
 const index_1 = require("../src/index");
 // tslint:disable-next-line:no-var-requires
 const cbor = require("cbor");
@@ -49,10 +51,23 @@ describe("#mac", () => {
         }
         chai_1.expect(arr).to.eql(Object.keys(payloadexpected));
     });
+    it("should throw KeyError because there's an invalid payload Key", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        // act & assert
+        try {
+            await cwt.mac({ 1: "bad key" }, secret);
+            throw new Error("'cwt.mac' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(KeyError_class_1.KeyError);
+        }
+    });
     // TODO: Add test that keys like 1 in the payload throw an error when calling cwt.mac
 });
 describe("#decode", () => {
-    it("should return the payload without verifying if the signature is valid", async () => {
+    it("should return the payload without verifying if the signature is valid. Here, payload is a map", async () => {
         // arrange
         const cwt = new index_1.Cborwebtoken();
         const token = "2D3RhEOhAQSgWFCnAXVjb2FwOi8vYXMuZXhhbXBsZS5jb20CZWVyaWt3A3gYY29hcDovL2x"
@@ -64,6 +79,20 @@ describe("#decode", () => {
             iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
             exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"),
         });
+    });
+    // TODO: Add test with reverting payload keys back
+});
+describe("#decode", () => {
+    // tslint:disable-next-line:max-line-length
+    it("should return the payload without verifying if the signature is valid. Here, payload is an object", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        const token = await cwt.mac({ test: "test" }, secret);
+        // act
+        const payload = await cwt.decode(token);
+        // assert
+        chai_1.expect(payload).to.eql({ test: "test" });
     });
     // TODO: Add test with reverting payload keys back
 });
@@ -82,8 +111,42 @@ describe("#verify", () => {
         // assert
         chai_1.expect(verifiedPayload).to.eql(payload);
     });
-    // TODO: Add test with failing signature (should throw TokenError)
-    // TODO: Add test with failing exp (should throw KeyError)
-    // TODO: Add test without a exp
+    it("should throw tag mismatch for invalid token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        const token = "2D3RhEOhAQSgQaBISq4BtGzpRSI=";
+        // act & assert
+        try {
+            await cwt.verify(token, secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err.message).to.eql("Tag mismatch");
+        }
+    });
+    it("should throw TokenError because exp is reached", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        const token = "2D3RhEOhAQSgR6EEGj47KrBI6scaiqIJrRU="; // contains expired token 1044064944
+        // act & assert
+        try {
+            await cwt.verify(token, secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(TokenError_class_1.TokenError);
+        }
+    });
+    it("should allow Tokens without exp", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        const token = await cwt.mac({ test: "test" }, secret); // contains token w/o exp
+        // act & assert
+        const actualpayload = await cwt.verify(token, secret);
+        chai_1.expect(actualpayload).to.eql({ test: "test" });
+    });
 });
 //# sourceMappingURL=index.spec.js.map
