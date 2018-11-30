@@ -21,7 +21,7 @@ class Cborwebtoken {
      */
     async mac(payload, secret) {
         const mappedPayload = cbor.encode(this.translateClaims(payload));
-        const buf = await cose.mac.create({ p: { alg: "SHA-256_64" } }, mappedPayload, [{ key: secret }]);
+        const buf = await cose.mac.create({ p: { alg: "SHA-256_64" } }, mappedPayload, { key: secret });
         return Buffer.concat([Cborwebtoken.CWT_TAG, buf]).toString("base64");
     }
     /**

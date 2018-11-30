@@ -27,7 +27,7 @@ export class Cborwebtoken {
         const buf = await cose.mac.create(
             { p: { alg: "SHA-256_64" } },
             mappedPayload,
-            [{ key: secret }]);
+            { key: secret });
         return Buffer.concat([Cborwebtoken.CWT_TAG, buf]).toString("base64");
     }
 

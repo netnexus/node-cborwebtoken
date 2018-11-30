@@ -1,7 +1,7 @@
 {
     "extends": "tslint:latest",
     "rules": {
-      // required for chai
-      "no-unused-expression": false
+      "no-unused-expression": false,
+      "no-implicit-dependencies": [true, "dev"]
     }
   }
