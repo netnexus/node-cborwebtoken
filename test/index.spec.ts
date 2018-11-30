@@ -62,7 +62,7 @@ describe("#mac", () => {
         try {
             await cwt.mac({1: "bad key"}, secret);
             throw new Error("'cwt.mac' should have thrown an error");
-        }catch (err) {
+        } catch (err) {
             expect(err).to.be.an.instanceOf(KeyError);
         }
     });
