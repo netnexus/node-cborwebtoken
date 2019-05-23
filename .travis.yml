@@ -6,6 +6,7 @@ addons:
     packages:
     - musl-dev
 before_install:
+- ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 - npm install -g typescript
 - npm install
 - tsc
