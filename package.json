@@ -1,6 +1,6 @@
 {
   "name": "@netnexus/node-cborwebtoken",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "Implementation of CBOR Web Tokens for node",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -20,13 +20,13 @@
     "index.js"
   ],
   "devDependencies": {
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^12.0.2",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.6.6",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
-    "tslint": "^5.16.0",
+    "tslint": "^5.18.0",
     "types": "^0.1.1",
-    "typescript": "^3.4.5"
+    "typescript": "^3.5.3"
   },
   "scripts": {
     "test": "tslint -p . && tsc && mocha ./dist/test/*.spec.js"
