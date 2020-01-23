@@ -148,5 +148,44 @@ describe("#verify", () => {
         const actualpayload = await cwt.verify(token, secret);
         chai_1.expect(actualpayload).to.eql({ test: "test" });
     });
+    it("should throw error for empty token string", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        // act & assert
+        try {
+            await cwt.verify("", secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for undefined token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        // act & assert
+        try {
+            await cwt.verify(undefined, secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for null token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const secret = "my-secret";
+        // act & assert
+        try {
+            await cwt.verify(null, secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
 });
 //# sourceMappingURL=index.spec.js.map
