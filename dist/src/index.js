@@ -114,9 +114,9 @@ class Cborwebtoken {
         return ret;
     }
 }
+exports.Cborwebtoken = Cborwebtoken;
 /**
  * Tag for CWT
  */
 Cborwebtoken.CWT_TAG = Buffer.from("d83d", "hex");
-exports.Cborwebtoken = Cborwebtoken;
 //# sourceMappingURL=index.js.map

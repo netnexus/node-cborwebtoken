@@ -67,7 +67,7 @@ describe("#mac", () => {
     // TODO: Add test that keys like 1 in the payload throw an error when calling cwt.mac
 });
 describe("#decode", () => {
-    it("should return the payload without verifying if the signature is valid. Here, payload is a map", async () => {
+    it("should return the map payload without verifying if the signature is valid.", async () => {
         // arrange
         const cwt = new index_1.Cborwebtoken();
         const token = "2D3RhEOhAQSgWFCnAXVjb2FwOi8vYXMuZXhhbXBsZS5jb20CZWVyaWt3A3gYY29hcDovL2x"
@@ -81,10 +81,7 @@ describe("#decode", () => {
         });
     });
     // TODO: Add test with reverting payload keys back
-});
-describe("#decode", () => {
-    // tslint:disable-next-line:max-line-length
-    it("should return the payload without verifying if the signature is valid. Here, payload is an object", async () => {
+    it("should return the object payload without verifying if the signature is valid.", async () => {
         // arrange
         const cwt = new index_1.Cborwebtoken();
         const secret = "my-secret";
