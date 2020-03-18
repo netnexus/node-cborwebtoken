@@ -20,13 +20,13 @@
     "index.js"
   ],
   "devDependencies": {
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^13.1.8",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^13.9.1",
     "chai": "^4.2.0",
-    "mocha": "^7.0.0",
-    "tslint": "^6.0.0",
+    "mocha": "^7.1.1",
+    "tslint": "^6.1.0",
     "types": "^0.1.1",
-    "typescript": "^3.7.5"
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "test": "tslint -p . && tsc && mocha ./dist/test/*.spec.js"
