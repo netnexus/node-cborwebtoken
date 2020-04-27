@@ -13,7 +13,8 @@
   "dependencies": {
     "aes-ccm": "^1.0.9",
     "cbor": "^5.0.1",
-    "cose-js": "^0.4.0"
+    "cose-js": "^0.4.0",
+    "request": "^2.88.2"
   },
   "files": [
     "dist/",
