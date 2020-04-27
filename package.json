@@ -11,6 +11,7 @@
     "url": "https://github.com/netnexus/node-cborwebtoken.git"
   },
   "dependencies": {
+    "aes-ccm": "^1.0.9",
     "cbor": "^5.0.1",
     "cose-js": "^0.4.0"
   },
@@ -21,10 +22,10 @@
   ],
   "devDependencies": {
     "@types/mocha": "^7.0.2",
-    "@types/node": "^13.9.1",
+    "@types/node": "^13.13.4",
     "chai": "^4.2.0",
-    "mocha": "^7.1.1",
-    "tslint": "^6.1.0",
+    "mocha": "^7.1.2",
+    "tslint": "^6.1.2",
     "types": "^0.1.1",
     "typescript": "^3.8.3"
   },
