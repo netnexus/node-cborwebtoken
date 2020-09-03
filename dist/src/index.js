@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Cborwebtoken = void 0;
 const KeyError_class_1 = require("./errors/KeyError.class");
 const TokenError_class_1 = require("./errors/TokenError.class");
 // tslint:disable-next-line:no-var-requires
