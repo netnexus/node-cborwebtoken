@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Cborwebtoken = void 0;
 const KeyError_class_1 = require("./errors/KeyError.class");
 const TokenError_class_1 = require("./errors/TokenError.class");
 // tslint:disable-next-line:no-var-requires
@@ -21,7 +22,7 @@ class Cborwebtoken {
      */
     async mac(payload, secret) {
         const mappedPayload = cbor.encode(this.translateClaims(payload));
-        const buf = await cose.mac.create({ p: { alg: "SHA-256_64" } }, mappedPayload, [{ key: secret }]);
+        const buf = await cose.mac.create({ p: { alg: "SHA-256_64" } }, mappedPayload, { key: secret });
         return Buffer.concat([Cborwebtoken.CWT_TAG, buf]).toString("base64");
     }
     /**
@@ -114,9 +115,9 @@ class Cborwebtoken {
         return ret;
     }
 }
+exports.Cborwebtoken = Cborwebtoken;
 /**
  * Tag for CWT
  */
 Cborwebtoken.CWT_TAG = Buffer.from("d83d", "hex");
-exports.Cborwebtoken = Cborwebtoken;
 //# sourceMappingURL=index.js.map

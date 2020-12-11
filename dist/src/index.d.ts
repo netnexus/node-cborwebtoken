@@ -36,24 +36,24 @@ export declare class Cborwebtoken {
      *
      * @param {any} obj payload
      */
-    private translateClaims(obj);
+    private translateClaims;
     /**
      * Revert replacement of claims keys with numbers. E.g. Map {1 => "test"} will
      * become {iss: "test"}.
      *
      * @param {object} obj payload
      */
-    private revertClaims(obj);
+    private revertClaims;
     /**
      * Helper to check if a timestamp is expired.
      *
      * @param {number} ts timestamp
      */
-    private isExpired(ts);
+    private isExpired;
     /**
      * Helper to invert objects: {1: "iss"} becomes {"iss": 1}.
      *
      * @param {any} obj
      */
-    private swap(obj);
+    private swap;
 }
