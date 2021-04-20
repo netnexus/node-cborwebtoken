@@ -2,8 +2,8 @@ language: node_js
 node_js:
   - "node"
 before_install:
-- npm install -g typescript
-- npm install
-- tsc
+  - npm install -g typescript
+  - npm ci
+  - tsc
 script:
-- npm test
+  - npm test
