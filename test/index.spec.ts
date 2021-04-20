@@ -60,9 +60,9 @@ describe("#mac", () => {
         const secret = "my-secret";
         // act & assert
         try {
-            await cwt.mac({1: "bad key"}, secret);
+            await cwt.mac({ 1: "bad key" }, secret);
             throw new Error("'cwt.mac' should have thrown an error");
-        }catch (err) {
+        } catch (err) {
             expect(err).to.be.an.instanceOf(KeyError);
         }
     });
@@ -71,12 +71,12 @@ describe("#mac", () => {
 });
 
 describe("#decode", () => {
-    it("should return the payload without verifying if the signature is valid. Here, payload is a map", async () => {
+    it("should return the map payload without verifying if the signature is valid.", async () => {
         // arrange
         const cwt = new Cborwebtoken();
         const token = "2D3RhEOhAQSgWFCnAXVjb2FwOi8vYXMuZXhhbXBsZS5jb20CZWVyaWt3A3gYY29hcDovL2x"
             + "pZ2h0LmV4YW1wbGUuY29tBBqRrXiwBRpWENnwBhpWENnwB0ILcUgJMQHvbXiSAA==";
-                // act
+        // act
         const payload = await cwt.decode(token);
 
         // assert
@@ -86,20 +86,17 @@ describe("#decode", () => {
         });
     });
     // TODO: Add test with reverting payload keys back
-});
 
-describe("#decode", () => {
-    // tslint:disable-next-line:max-line-length
-    it("should return the payload without verifying if the signature is valid. Here, payload is an object", async () => {
+    it("should return the object payload without verifying if the signature is valid.", async () => {
         // arrange
         const cwt = new Cborwebtoken();
         const secret = "my-secret";
-        const token = await cwt.mac({test: "test"}, secret);
-                // act
+        const token = await cwt.mac({ test: "test" }, secret);
+        // act
         const payload = await cwt.decode(token);
 
         // assert
-        expect(payload).to.eql({test: "test"});
+        expect(payload).to.eql({ test: "test" });
     });
     // TODO: Add test with reverting payload keys back
 });
@@ -154,9 +151,48 @@ describe("#verify", () => {
         // arrange
         const cwt = new Cborwebtoken();
         const secret = "my-secret";
-        const token = await cwt.mac({test: "test"}, secret); // contains token w/o exp
+        const token = await cwt.mac({ test: "test" }, secret); // contains token w/o exp
         // act & assert
         const actualpayload = await cwt.verify(token, secret);
-        expect(actualpayload).to.eql({test: "test"});
+        expect(actualpayload).to.eql({ test: "test" });
+    });
+
+    it("should throw error for empty token string", async () => {
+        // arrange
+        const cwt = new Cborwebtoken();
+        const secret = "my-secret";
+        // act & assert
+        try {
+            await cwt.verify("", secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        } catch (err) {
+            expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+
+    it("should throw error for undefined token", async () => {
+        // arrange
+        const cwt = new Cborwebtoken();
+        const secret = "my-secret";
+        // act & assert
+        try {
+            await cwt.verify(undefined, secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        } catch (err) {
+            expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+
+    it("should throw error for null token", async () => {
+        // arrange
+        const cwt = new Cborwebtoken();
+        const secret = "my-secret";
+        // act & assert
+        try {
+            await cwt.verify(null, secret);
+            throw new Error("'cwt.verify' should have thrown an error");
+        } catch (err) {
+            expect(err).to.be.an.instanceOf(Error);
+        }
     });
 });
