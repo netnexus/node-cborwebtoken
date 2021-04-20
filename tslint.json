@@ -1,7 +1,10 @@
 {
-    "extends": "tslint:latest",
-    "rules": {
-      "no-unused-expression": false,
-      "no-implicit-dependencies": [true, "dev"]
-    }
+  "extends": "tslint:latest",
+  "rules": {
+    "no-implicit-dependencies": [
+      true,
+      "dev"
+    ],
+    "no-unused-expression": false
   }
+}
