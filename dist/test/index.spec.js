@@ -24,7 +24,7 @@ describe("#mac", () => {
             + "2656572696b77037818636f61703a2f2f6c696768742e6578616d706c652e636f6d041a5612aeb0051a5610d9f0061a5610d"
             + "9f007420b7148093101ef6d789200", "hex")
             .toString("base64");
-        chai_1.expect(token).to.eql(expectedBase64);
+        (0, chai_1.expect)(token).to.eql(expectedBase64);
     });
     it("should replace payload keys", async () => {
         // arrange
@@ -49,7 +49,7 @@ describe("#mac", () => {
         for (const key of Array.from(actualpayload.keys())) {
             arr.push(key.toString());
         }
-        chai_1.expect(arr).to.eql(Object.keys(payloadexpected));
+        (0, chai_1.expect)(arr).to.eql(Object.keys(payloadexpected));
     });
     it("should throw KeyError because there's an invalid payload Key", async () => {
         // arrange
@@ -61,7 +61,7 @@ describe("#mac", () => {
             throw new Error("'cwt.mac' should have thrown an error");
         }
         catch (err) {
-            chai_1.expect(err).to.be.an.instanceOf(KeyError_class_1.KeyError);
+            (0, chai_1.expect)(err).to.be.an.instanceOf(KeyError_class_1.KeyError);
         }
     });
     // TODO: Add test that keys like 1 in the payload throw an error when calling cwt.mac
@@ -75,7 +75,7 @@ describe("#decode", () => {
         // act
         const payload = await cwt.decode(token);
         // assert
-        chai_1.expect(payload).to.eql({
+        (0, chai_1.expect)(payload).to.eql({
             iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
             exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"),
         });
@@ -89,7 +89,7 @@ describe("#decode", () => {
         // act
         const payload = await cwt.decode(token);
         // assert
-        chai_1.expect(payload).to.eql({ test: "test" });
+        (0, chai_1.expect)(payload).to.eql({ test: "test" });
     });
     // TODO: Add test with reverting payload keys back
 });
@@ -106,7 +106,7 @@ describe("#verify", () => {
         // act
         const verifiedPayload = await cwt.verify(token, secret);
         // assert
-        chai_1.expect(verifiedPayload).to.eql(payload);
+        (0, chai_1.expect)(verifiedPayload).to.eql(payload);
     });
     it("should throw tag mismatch for invalid token", async () => {
         // arrange
@@ -119,7 +119,7 @@ describe("#verify", () => {
             throw new Error("'cwt.verify' should have thrown an error");
         }
         catch (err) {
-            chai_1.expect(err.message).to.eql("Tag mismatch");
+            (0, chai_1.expect)(err.message).to.eql("Tag mismatch");
         }
     });
     it("should throw TokenError because exp is reached", async () => {
@@ -133,7 +133,7 @@ describe("#verify", () => {
             throw new Error("'cwt.verify' should have thrown an error");
         }
         catch (err) {
-            chai_1.expect(err).to.be.an.instanceOf(TokenError_class_1.TokenError);
+            (0, chai_1.expect)(err).to.be.an.instanceOf(TokenError_class_1.TokenError);
         }
     });
     it("should allow Tokens without exp", async () => {
@@ -143,7 +143,7 @@ describe("#verify", () => {
         const token = await cwt.mac({ test: "test" }, secret); // contains token w/o exp
         // act & assert
         const actualpayload = await cwt.verify(token, secret);
-        chai_1.expect(actualpayload).to.eql({ test: "test" });
+        (0, chai_1.expect)(actualpayload).to.eql({ test: "test" });
     });
     it("should throw error for empty token string", async () => {
         // arrange
@@ -155,7 +155,7 @@ describe("#verify", () => {
             throw new Error("'cwt.verify' should have thrown an error");
         }
         catch (err) {
-            chai_1.expect(err).to.be.an.instanceOf(Error);
+            (0, chai_1.expect)(err).to.be.an.instanceOf(Error);
         }
     });
     it("should throw error for undefined token", async () => {
@@ -168,7 +168,7 @@ describe("#verify", () => {
             throw new Error("'cwt.verify' should have thrown an error");
         }
         catch (err) {
-            chai_1.expect(err).to.be.an.instanceOf(Error);
+            (0, chai_1.expect)(err).to.be.an.instanceOf(Error);
         }
     });
     it("should throw error for null token", async () => {
@@ -181,7 +181,7 @@ describe("#verify", () => {
             throw new Error("'cwt.verify' should have thrown an error");
         }
         catch (err) {
-            chai_1.expect(err).to.be.an.instanceOf(Error);
+            (0, chai_1.expect)(err).to.be.an.instanceOf(Error);
         }
     });
 });

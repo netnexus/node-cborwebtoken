@@ -11,8 +11,8 @@
     "url": "https://github.com/netnexus/node-cborwebtoken.git"
   },
   "dependencies": {
-    "cbor": "^7.0.5",
-    "cose-js": "^0.4.2"
+    "cbor": "^8.1.0",
+    "cose-js": "^0.8.2"
   },
   "files": [
     "dist/"
