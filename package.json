@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "cbor": "^7.0.5",
-    "cose-js": "^0.4.2"
+    "cose-js": "^0.8.4"
   },
   "files": [
     "dist/"
