@@ -5,6 +5,23 @@ const cbor = require("cbor");
 // tslint:disable-next-line:no-var-requires
 const cose = require("cose-js");
 
+/**
+ * An ECDSA private key in raw format as defined in RFC 6090 / SEC1.
+ * `d` is the private key scalar component.
+ */
+export interface EcPrivateKey {
+    d: Buffer;
+}
+
+/**
+ * An ECDSA public key in raw format as defined in RFC 6090 / SEC1.
+ * `x` and `y` are the elliptic curve point coordinates.
+ */
+export interface EcPublicKey {
+    x: Buffer;
+    y: Buffer;
+}
+
 export class Cborwebtoken {
     /**
      * Tag for CWT
@@ -29,6 +46,44 @@ export class Cborwebtoken {
             mappedPayload,
             { key: secret });
         return Buffer.concat([Cborwebtoken.CWT_TAG, buf]).toString("base64");
+    }
+
+    /**
+     * Create a CborWebToken signed with an ECDSA private key and return it as a base64 encoded string.
+     *
+     * @param {any} payload - data which should be included into the token.
+     * @param {EcPrivateKey} key - an EC private key with raw key material ({ d: Buffer }).
+     * @param {string} algorithm - the signing algorithm to use. Supported values: 'ES256', 'ES384', 'ES512'.
+     *   Defaults to 'ES256'.
+     */
+    public async sign(payload: any, key: EcPrivateKey, algorithm: string = "ES256"): Promise<string> {
+        const supportedAlgorithms = ["ES256", "ES384", "ES512"];
+        if (!supportedAlgorithms.includes(algorithm)) {
+            throw new Error(`Unsupported algorithm '${algorithm}'. Supported algorithms: ${supportedAlgorithms.join(", ")}`);
+        }
+        const mappedPayload = cbor.encode(this.translateClaims(payload));
+        const buf = await cose.sign.create(
+            { p: { alg: algorithm } },
+            mappedPayload,
+            { key });
+        return Buffer.concat([Cborwebtoken.CWT_TAG, buf]).toString("base64");
+    }
+
+    /**
+     * Check ECDSA token signature and exp, and return payload or throw an error if validation
+     * fails.
+     *
+     * @param {string} token - The base64 encoded token to be decoded and verified.
+     * @param {EcPublicKey} key - an EC public key with raw key material ({ x: Buffer, y: Buffer }).
+     */
+    public async verifySign(token: string, key: EcPublicKey): Promise<any> {
+        const payload = cbor.decode(await cose.sign.verify(Buffer.from(token, "base64").slice(2), { key }));
+        if (!(payload instanceof Map)) {
+            return payload;
+        }
+        const exptime = payload.get(4);
+        this.isExpired(exptime);
+        return this.revertClaims(payload);
     }
 
     /**

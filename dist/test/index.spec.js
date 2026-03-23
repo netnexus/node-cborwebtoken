@@ -185,4 +185,173 @@ describe("#verify", () => {
         }
     });
 });
+// Key material from RFC 8392 Appendix A.2 / cose-js examples
+const ecPrivateKey = {
+    d: Buffer.from("6c1382765aec5358f117733d281c1c7bdc39884d04a45a1e6c67c858bc206c19", "hex"),
+};
+const ecPublicKey = {
+    x: Buffer.from("143329cce7868e416927599cf65a34f3ce2ffda55a7eca69ed8919a394d42f0f", "hex"),
+    y: Buffer.from("60f7f1a780d8a783bfb7a2dd6b2796e8128dbbcef9d3d168db9529971a36e7b9", "hex"),
+};
+describe("#sign", () => {
+    it("should return a signed CborWebToken as a string", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const payload = {
+            iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
+            exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"),
+        };
+        // act
+        const token = await cwt.sign(payload, ecPrivateKey);
+        // assert
+        chai_1.expect(token).to.be.a("string");
+        chai_1.expect(token.length).to.be.greaterThan(0);
+    });
+    it("should replace payload claims with numeric keys in the signed token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const payload = {
+            iss: "coap://as.example.com", sub: "erikw",
+            exp: 2444064944, test: "test",
+        };
+        // act
+        const token = await cwt.sign(payload, ecPrivateKey);
+        // assert
+        const decoded = cbor.decode(Buffer.from(token, "base64").slice(2));
+        const actualPayload = cbor.decode(decoded.value[2]);
+        chai_1.expect(actualPayload.get(1)).to.eql("coap://as.example.com");
+        chai_1.expect(actualPayload.get(2)).to.eql("erikw");
+        chai_1.expect(actualPayload.get(4)).to.eql(2444064944);
+        chai_1.expect(actualPayload.get("test")).to.eql("test");
+    });
+    it("should throw KeyError because there's an invalid payload key", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.sign({ 1: "bad key" }, ecPrivateKey);
+            throw new Error("'cwt.sign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(KeyError_class_1.KeyError);
+        }
+    });
+    it("should throw an error for an unsupported algorithm", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.sign({ test: "test" }, ecPrivateKey, "RS256");
+            throw new Error("'cwt.sign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+            chai_1.expect(err.message).to.include("Unsupported algorithm");
+        }
+    });
+});
+describe("#verifySign", () => {
+    it("should return the payload if the ECDSA signature is valid", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const payload = {
+            iss: "coap://as.example.com", sub: "erikw", aud: "coap://light.example.com",
+            exp: 2444064944, nbf: 1443944944, iat: 1443944944, cti: Buffer.from("0b71", "hex"),
+        };
+        const token = await cwt.sign(payload, ecPrivateKey);
+        // act
+        const verifiedPayload = await cwt.verifySign(token, ecPublicKey);
+        // assert
+        chai_1.expect(verifiedPayload).to.eql(payload);
+    });
+    it("should allow signed tokens without exp claim", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const token = await cwt.sign({ test: "test" }, ecPrivateKey);
+        // act
+        const verifiedPayload = await cwt.verifySign(token, ecPublicKey);
+        // assert
+        chai_1.expect(verifiedPayload).to.eql({ test: "test" });
+    });
+    it("should throw TokenError because exp is reached", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const expiredPayload = { exp: 1044064944 }; // expired timestamp
+        const token = await cwt.sign(expiredPayload, ecPrivateKey);
+        // act & assert
+        try {
+            await cwt.verifySign(token, ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(TokenError_class_1.TokenError);
+        }
+    });
+    it("should throw an error when verifying with a wrong public key", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const token = await cwt.sign({ test: "test" }, ecPrivateKey);
+        const wrongPublicKey = {
+            x: Buffer.from("bac5b11cad8f99f9c72b05cf4b9e26d244dc189f745228255a219a86d6a09eff", "hex"),
+            y: Buffer.from("20138bf82dc1b6d562be0fa54ab7804a3a64b6d72ccfed6b6fb6ed28bbfc117e", "hex"),
+        };
+        // act & assert
+        try {
+            await cwt.verifySign(token, wrongPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw an error for an invalid (non-Sign1) token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const invalidToken = "2D3RhEOhAQSgQaBISq4BtGzpRSI="; // a COSE_Mac0 token, not a Sign1
+        // act & assert
+        try {
+            await cwt.verifySign(invalidToken, ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for empty token string", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.verifySign("", ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for undefined token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.verifySign(undefined, ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for null token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.verifySign(null, ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+});
 //# sourceMappingURL=index.spec.js.map
