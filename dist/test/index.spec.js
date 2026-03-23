@@ -304,5 +304,54 @@ describe("#verifySign", () => {
             chai_1.expect(err).to.be.an.instanceOf(Error);
         }
     });
+    it("should throw an error for an invalid (non-Sign1) token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        const invalidToken = "2D3RhEOhAQSgQaBISq4BtGzpRSI="; // a COSE_Mac0 token, not a Sign1
+        // act & assert
+        try {
+            await cwt.verifySign(invalidToken, ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for empty token string", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.verifySign("", ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for undefined token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.verifySign(undefined, ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
+    it("should throw error for null token", async () => {
+        // arrange
+        const cwt = new index_1.Cborwebtoken();
+        // act & assert
+        try {
+            await cwt.verifySign(null, ecPublicKey);
+            throw new Error("'cwt.verifySign' should have thrown an error");
+        }
+        catch (err) {
+            chai_1.expect(err).to.be.an.instanceOf(Error);
+        }
+    });
 });
 //# sourceMappingURL=index.spec.js.map
